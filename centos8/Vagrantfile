@@ -4,7 +4,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 # Ubuntu Desktop 20.04
   config.vm.define :ansible do |ansible|
-    ansible.vm.box = "geerlingguy/centos7"
+    ansible.vm.box = "geerlingguy/centos8"
     ansible.vm.hostname = "ansibledev"
     ansible.vm.network "private_network", ip: "192.168.64.10"
     ansible.vm.provider "virtualbox" do |tl2d|
@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
   config.vm.define :client1 do |client1|
-    client1.vm.box = "geerlingguy/centos7"
+    client1.vm.box = "geerlingguy/centos8"
     client1.vm.hostname = "Client1"
     client1.vm.network "private_network", ip: "192.168.64.11"
     client1.vm.provider "virtualbox" do |cl1|
@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
   config.vm.define :client2 do |client2|
-    client2.vm.box = "geerlingguy/centos7"
+    client2.vm.box = "geerlingguy/centos8"
     client2.vm.hostname = "client2"
     client2.vm.network "private_network", ip: "192.168.64.12"
     client2.vm.provider "virtualbox" do |cl2|
