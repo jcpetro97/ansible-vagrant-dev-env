@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
-      tl2d.name = "ansibledev"
+      tl2d.name = "ubuntu1804-ansibledev"
     end
   end
   config.vm.define :client1 do |client1|
@@ -22,7 +22,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cl1.memory = 1024
       cl1.cpus = 1
       cl1.gui = false
-      cl1.name = "Client1"
+      cl1.name = "ubuntu1804-Client1"
     end
   end
   config.vm.define :client2 do |client2|
@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cl2.memory = 1024
       cl2.cpus = 1
       cl2.gui = false
-      cl2.name = "client2"
+      cl2.name = "ubuntu1804-client2"
     end
   end
 
