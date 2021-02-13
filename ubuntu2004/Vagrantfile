@@ -2,18 +2,26 @@
 # vi: set ft=ruby :
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '.', '/vagrant', disabled: false
 # Ubuntu Desktop 20.04
-  config.vm.define :ansible do |ansible|
-    ansible.vm.box = "geerlingguy/ubuntu2004"
-    ansible.vm.hostname = "ansibledev"
-    ansible.vm.network "private_network", ip: "192.168.64.2"
-    ansible.vm.provider "virtualbox" do |tl2d|
+  config.vm.define :server do |cn|
+    cn.vm.box = "geerlingguy/ubuntu2004"
+    cn.vm.hostname = "ansibledev"
+    cn.vm.network "private_network", ip: "192.168.64.2"
+    cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
       tl2d.name = "ubuntu2004-ansibledev"
     end
+    cn.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      #ansible.ask_vault_pass = true
+      ansible.limit = "server"
+      ansible.playbook = "provisioning/ansible.yml"
+#      ansible.verbose = "vvv"
+    end
+
   end
   config.vm.define :client1 do |client1|
     client1.vm.box = "geerlingguy/ubuntu2004"
