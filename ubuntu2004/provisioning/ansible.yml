@@ -17,6 +17,10 @@
     retries: 12
     become_user: root
     until: patched is successful
+  - name: Install sshpass, requirement for ansible
+    apt:
+      name: sshpass
+      state: present
   - name: Ensure dirmngr is installed (gnupg dependency).
     apt:
       name: dirmngr
