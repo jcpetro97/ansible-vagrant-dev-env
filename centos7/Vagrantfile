@@ -2,21 +2,28 @@
 # vi: set ft=ruby :
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.synced_folder '.', '/vagrant', disabled: true
   # Ubuntu Desktop 20.04
-  config.vm.define :ansible do |ansible|
-    ansible.vm.box = "geerlingguy/centos7"
-    ansible.vm.hostname = "ansibledev"
-    ansible.vm.network "private_network", ip: "192.168.64.7"
-    ansible.vm.provider "virtualbox" do |tl2d|
+  config.vm.define :server do |cn|
+    cn.vm.box = "jcpetro97/centos7"
+    cn.vm.synced_folder '.', '/vagrant', disabled: false
+    cn.vm.hostname = "ansibledev"
+    cn.vm.network "private_network", ip: "192.168.64.7"
+    cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
       tl2d.name = "centos7-ansible"
     end
+    cn.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      ansible.limit = "server"
+      ansible.playbook = "provisioning/ansible.yml"
+#      ansible.verbose = "vvv"
+    end
+
   end
   config.vm.define :client1 do |client1|
-    client1.vm.box = "geerlingguy/centos7"
+    client1.vm.box = "jcpetro97/centos7"
     client1.vm.hostname = "Client1"
     client1.vm.network "private_network", ip: "192.168.64.8"
     client1.vm.provider "virtualbox" do |cl1|
@@ -27,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
   config.vm.define :client2 do |client2|
-    client2.vm.box = "geerlingguy/centos7"
+    client2.vm.box = "jcpetro97/centos7"
     client2.vm.hostname = "client2"
     client2.vm.network "private_network", ip: "192.168.64.9"
     client2.vm.provider "virtualbox" do |cl2|
