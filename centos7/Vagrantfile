@@ -14,13 +14,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       tl2d.gui = false
       tl2d.name = "centos7-ansible"
     end
-    cn.vm.provision "ansible" do |ansible|
-      ansible.compatibility_mode = "2.0"
-      ansible.limit = "server"
-      ansible.playbook = "provisioning/ansible.yml"
-#      ansible.verbose = "vvv"
-    end
-
+#     cn.vm.provision "ansible" do |ansible|
+#       ansible.compatibility_mode = "2.0"
+#       ansible.limit = "server"
+#       ansible.playbook = "provisioning/ansible.yml"
+# #      ansible.verbose = "vvv"
+#     end
+    cn.vm.provision "shell", path: "provisioning/ansible.sh"
   end
   config.vm.define :client1 do |client1|
     client1.vm.box = "jcpetro97/centos7"
