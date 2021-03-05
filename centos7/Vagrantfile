@@ -6,13 +6,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :server do |cn|
     cn.vm.box = "jcpetro97/centos7"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
-    cn.vm.hostname = "ansibledev"
+    cn.vm.hostname = "ansible29xdev"
     cn.vm.network "private_network", ip: "192.168.64.7"
     cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
-      tl2d.name = "centos7-ansible"
+      tl2d.name = "centos7-ansible29xdev"
     end
 #     cn.vm.provision "ansible" do |ansible|
 #       ansible.compatibility_mode = "2.0"

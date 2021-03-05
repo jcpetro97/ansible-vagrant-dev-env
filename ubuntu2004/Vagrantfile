@@ -4,27 +4,20 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 # Ubuntu Desktop 20.04
   config.vm.define :server do |cn|
-    cn.vm.box = "geerlingguy/ubuntu2004"
+    cn.vm.box = "jcpetro97/ubuntu2004"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
-    cn.vm.hostname = "ansibledev"
+    cn.vm.hostname = "ansible29xdev"
     cn.vm.network "private_network", ip: "192.168.64.2"
     cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
-      tl2d.name = "ubuntu2004-ansibledev"
+      tl2d.name = "ubuntu2004-ansible29xdev"
     end
-    cn.vm.provision "ansible" do |ansible|
-      ansible.compatibility_mode = "2.0"
-      #ansible.ask_vault_pass = true
-      ansible.limit = "server"
-      ansible.playbook = "provisioning/ansible.yml"
-#      ansible.verbose = "vvv"
-    end
-
+    cn.vm.provision "shell", path: "provisioning/ansible.sh"
   end
   config.vm.define :client1 do |client1|
-    client1.vm.box = "geerlingguy/ubuntu2004"
+    client1.vm.box = "jcpetro97/ubuntu2004"
     client1.vm.hostname = "Client1"
     client1.vm.network "private_network", ip: "192.168.64.3"
     client1.vm.provider "virtualbox" do |cl1|
@@ -35,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
   config.vm.define :client2 do |client2|
-    client2.vm.box = "geerlingguy/ubuntu2004"
+    client2.vm.box = "jcpetro97/ubuntu2004"
     client2.vm.hostname = "client2"
     client2.vm.network "private_network", ip: "192.168.64.4"
     client2.vm.provider "virtualbox" do |cl2|
