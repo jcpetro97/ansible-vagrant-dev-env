@@ -12,10 +12,10 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 
 | OS         | vagrant box name       |Private IP Range|
 | ---------- | ---------------------- |----------------|
-| ubuntu2004 | jcpetro97/ubuntu2004 |192.168.64.[1-3]|
-| ubuntu1804 | jcpetro97/ubuntu1804 |192.168.64.[4-6]|
-| centos7    | jcpetro97/centos7    |192.168.64.[7-9]|
-| centos8    | jcpetro97/centos8    |192.168.64.[10-12]|
+| ubuntu2004 | jcpetro97/ubuntu2004 |192.168.70.[2-4]|
+| ubuntu1804 | jcpetro97/ubuntu1804 |192.168.71.[2-4]|
+| centos7    | jcpetro97/centos7    |192.168.72.[2-4]|
+| centos8    | jcpetro97/centos8    |192.168.73.[2-4]|
 
 
 ## How to Initialize
@@ -48,3 +48,5 @@ _Spin up clients_
 A basic ansible project structure is already there and it follows the ansible recommended alternate layout best practices.  
 
 **NOTE:** The layout used, assumes you are using the ansible-galaxy method of retrieving roles ( requirements.yml ).  There is more information in the roles/requirements.yml file.
+
+Basically, develop the playbook/role on the host, inside the directory of the OS desired.  To test, spin up the server, and one or both clients.  Log into the "server", cd to /vagrant and run the ansible playbook.
