@@ -1,8 +1,50 @@
-Skeleton Dev Environments for Ansible
+# Ansible Development and Testing templates
 
-| OS         | vagrant box            |Private IP Range|
+These are vagrant templates set up to do ansible development and testing.  Each OS ( listed below ) is set up with a control node, labled "server" and two clients labled "client1" and "client2"
+
+Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other vagrant boxes, but it hasn't been tested.
+## Requirements
+
+* Virtualbox 
+* Knowledge of vagrant commands
+* Basic knowledge of an ansible project layout
+## OS/Vagrant Box/IP Information
+
+| OS         | vagrant box name       |Private IP Range|
 | ---------- | ---------------------- |----------------|
-| ubuntu2004 | geerlingguy/ubuntu2004 |192.168.64.[1-3]|
-| ubuntu1804 | geerlingguy/ubuntu1804 |192.168.64.[4-6]|
-| centos7    | geerlingguy/centos7    |192.168.64.[7-9]|
-| centos8    | geerlingguy/centos8    |192.168.64.[10-12]|
+| ubuntu2004 | jcpetro97/ubuntu2004 |192.168.64.[1-3]|
+| ubuntu1804 | jcpetro97/ubuntu1804 |192.168.64.[4-6]|
+| centos7    | jcpetro97/centos7    |192.168.64.[7-9]|
+| centos8    | jcpetro97/centos8    |192.168.64.[10-12]|
+
+
+## How to Initialize
+
+* Clone this repository to your local machine
+* cd into the OS directory you want to use
+
+_Spin up the ansible server_
+
+* vagrant up <VM name>
+
+ex. `vagrant up server`
+
+**NOTE:** By default, when you spin up the server VM, it will install ansible from the 2.9.x tree.  If you want to use ansible from a different version tree, do the following:
+
+env ANSIBLE_VERSION=<version number> vagrant up server
+
+`env ANSIBLE_VERSION=2.10.4 vagrant up server`
+
+_Spin up clients_
+
+`vagrant up client1`
+
+**NOTE:** If you can put the name of the second client on the command line, just separate the VM names by a space.
+
+## How to use
+
+/vagrant is a shared folder, mapped from the host to the guest.  The source of /vagrant is the current working directory when the server was initialized.  
+
+A basic ansible project structure is already there and it follows the ansible recommended alternate layout best practices.  
+
+**NOTE:** The layout used, assumes you are using the ansible-galaxy method of retrieving roles ( requirements.yml ).  There is more information in the roles/requirements.yml file.
