@@ -50,3 +50,30 @@ A basic ansible project structure is already there and it follows the ansible re
 **NOTE:** The layout used, assumes you are using the ansible-galaxy method of retrieving roles ( requirements.yml ).  There is more information in the roles/requirements.yml file.
 
 Basically, develop the playbook/role on the host, inside the directory of the OS desired.  To test, spin up the server, and one or both clients.  Log into the "server", cd to /vagrant and run the ansible playbook.
+
+## How to add more clients
+
+* edit the Vagrantfile
+* at the end of the file, there is a comment that says `Add more client definitions here`  Beneath that line, paste the following:
+
+```
+  config.vm.define :VMNAME do |VMNAME|
+    VMNAME.vm.box = "jcpetro97/ubuntu2004"
+    VMNAME.vm.hostname = "Change Hostname"
+    VMNAME.vm.network "private_network", ip: "ADD IP"
+    VMNAME.vm.provider "virtualbox" do |cl2|
+      cl2.memory = 1024
+      cl2.cpus = 1
+      cl2.gui = false
+      cl2.name = "VIRTUALBOX VM NAME"
+    end
+  end
+```
+* Change any of the fields labled VMNAME, to what the new VM will be called ( ie. client3)
+* Change "ADD IP" to the next IP in the private range
+* If you want a different OS, change `jcpetro97/ubuntu2004` to another box name from vagrant cloud ( ie. jcpetro97/centos8 or geerlingguy/debian10, etc)
+* edit the ./inventory/inventory file, add the new vm and IP address.
+* run `vagrant status` to see if the new VM you want to create is listed
+* If there are no errors, run `vagrant up <NEW VM NAME>`
+
+**NOTE:** I currently have the following vagrant boxes hosted at vagrant cloud: jcpetro97/centos7, jcpetro97/centos8, jcpetro97/ubuntu1804, jcpetro97/ubuntu2004.
