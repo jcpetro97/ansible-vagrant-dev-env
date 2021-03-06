@@ -7,7 +7,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     cn.vm.box = "jcpetro97/centos7"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
     cn.vm.hostname = "ansibledev"
-    cn.vm.network "private_network", ip: "192.168.64.7"
+    cn.vm.network "private_network", ip: "192.168.72.2"
     cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :client1 do |client1|
     client1.vm.box = "jcpetro97/centos7"
     client1.vm.hostname = "Client1"
-    client1.vm.network "private_network", ip: "192.168.64.8"
+    client1.vm.network "private_network", ip: "192.168.72.3"
     client1.vm.provider "virtualbox" do |cl1|
       cl1.memory = 1024
       cl1.cpus = 1
@@ -34,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :client2 do |client2|
     client2.vm.box = "jcpetro97/centos7"
     client2.vm.hostname = "client2"
-    client2.vm.network "private_network", ip: "192.168.64.9"
+    client2.vm.network "private_network", ip: "192.168.72.4"
     client2.vm.provider "virtualbox" do |cl2|
       cl2.memory = 1024
       cl2.cpus = 1
@@ -42,5 +42,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cl2.name = "centos7-client2"
     end
   end
+# Add more client definitions here
 
 end
