@@ -9,7 +9,7 @@
 /usr/bin/python3 -m pip install --upgrade setuptools
 # Install Ansible.
 /usr/bin/echo "------> Install Ansible 2.9 <------"
-/usr/bin/python3 -m pip install ansible==2.9.17
+/usr/bin/python3 -m pip install ansible==2.9.18
 #
 /usr/bin/echo "------> Verify Ansible Version <------"
 /usr/local/bin/ansible --version

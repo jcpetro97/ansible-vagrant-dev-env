@@ -6,21 +6,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :server do |cn|
     cn.vm.box = "jcpetro97/centos7"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
-    cn.vm.hostname = "ansible29xdev"
+    cn.vm.hostname = "ansibledev"
     cn.vm.network "private_network", ip: "192.168.64.7"
     cn.vm.provider "virtualbox" do |tl2d|
       tl2d.memory = 2048
       tl2d.cpus = 2
       tl2d.gui = false
-      tl2d.name = "centos7-ansible29xdev"
+      tl2d.name = "centos7-ansibledev"
     end
-#     cn.vm.provision "ansible" do |ansible|
-#       ansible.compatibility_mode = "2.0"
-#       ansible.limit = "server"
-#       ansible.playbook = "provisioning/ansible.yml"
-# #      ansible.verbose = "vvv"
-#     end
-    cn.vm.provision "shell", path: "provisioning/ansible.sh"
+    cn.vm.provision "shell" do |s|
+      s.path = "../shared/rhel.sh"
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end
+
   end
   config.vm.define :client1 do |client1|
     client1.vm.box = "jcpetro97/centos7"
