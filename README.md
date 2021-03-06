@@ -43,11 +43,11 @@ _Spin up clients_
 
 ## How to use
 
-/vagrant is a shared folder, mapped from the host to the guest.  The source of /vagrant is the current working directory when the server was initialized.  
+`/vagrant` is a shared folder, mapped from the host to the guest.  The source of `/vagrant` is the current working directory when the server was initialized.  
 
 A basic ansible project structure is already there and it follows the ansible recommended alternate layout best practices.  
 
-**NOTE:** The layout used, assumes you are using the ansible-galaxy method of retrieving roles ( requirements.yml ).  There is more information in the roles/requirements.yml file.
+**NOTE:** The layout used, can be used with either the ansible-galaxy method for roles, or the traditional method.  If you are developing for a role to be used with AWX/Tower, then I would recommend the ansible-galaxy method for roles.  See roles/requirements.yml for some detail.
 
 Basically, develop the playbook/role on the host, inside the directory of the OS desired.  To test, spin up the server, and one or both clients.  Log into the "server", cd to /vagrant and run the ansible playbook.
 
@@ -72,7 +72,7 @@ Basically, develop the playbook/role on the host, inside the directory of the OS
 * Change any of the fields labled VMNAME, to what the new VM will be called ( ie. client3)
 * Change "ADD IP" to the next IP in the private range
 * If you want a different OS, change `jcpetro97/ubuntu2004` to another box name from vagrant cloud ( ie. jcpetro97/centos8 or geerlingguy/debian10, etc)
-* edit the ./inventory/inventory file, add the new vm and IP address.
+* edit the `./inventory/inventory` file, add the new vm and IP address.
 * run `vagrant status` to see if the new VM you want to create is listed
 * If there are no errors, run `vagrant up <NEW VM NAME>`
 
