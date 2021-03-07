@@ -3,7 +3,7 @@
 # Install Python.
 /bin/echo "------> installing python3 <------"
 /usr/bin/apt update
-/usr/bin/apt -y install python3 python3-pip
+/usr/bin/apt -y install python3 python3-pip sshpass
 /bin/echo "------> upgrade pip <------"
 /usr/bin/python3 -m pip install --upgrade pip
 /bin/echo "------> upgrade setuptools <------"
