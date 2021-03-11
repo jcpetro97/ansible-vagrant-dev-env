@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  #config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.ssh.insert_key = false
   config.vm.define :server do |cn|
     cn.vm.box = "jcpetro97/centos8"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
@@ -21,7 +21,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
   config.vm.define :client1 do |client1|
     client1.vm.box = "jcpetro97/centos8"
-    client1.vm.synced_folder '.', '/vagrant', disabled: false
     client1.vm.hostname = "Client1"
     client1.vm.network "private_network", ip: "192.168.73.3"
     client1.vm.provider "virtualbox" do |cl1|
