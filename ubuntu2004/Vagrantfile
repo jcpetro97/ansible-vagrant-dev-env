@@ -4,6 +4,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 # Ubuntu Desktop 20.04
   config.ssh.insert_key = false
+ # config.vbguest.auto_update = true
   config.vm.define :server do |cn|
     cn.vm.box = "jcpetro97/ubuntu2004"
     cn.vm.synced_folder '.', '/vagrant', disabled: false
