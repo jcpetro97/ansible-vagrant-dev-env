@@ -10,12 +10,13 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 * Basic knowledge of an ansible project layout
 ## OS/Vagrant Box/IP Information
 
-| OS         | vagrant box name       |Private IP Range|
-| ---------- | ---------------------- |----------------|
-| ubuntu2004 | jcpetro97/ubuntu2004 |192.168.70.[2-4]|
-| ubuntu1804 | jcpetro97/ubuntu1804 |192.168.71.[2-4]|
-| centos7    | jcpetro97/centos7    |192.168.72.[2-4]|
-| centos8    | jcpetro97/centos8    |192.168.73.[2-4]|
+| OS         | vagrant box name                         | Private IP Range |Note|
+| ---------- | ---------------------------------------- | ---------------- |----|
+| ubuntu2004 | jcpetro97/ubuntu2004                     | 192.168.70.[2-4] ||
+| ubuntu1804 | jcpetro97/ubuntu1804                     | 192.168.71.[2-4] ||
+| centos7    | jcpetro97/centos7                        | 192.168.72.[2-4] ||
+| centos8    | jcpetro97/centos8                        | 192.168.73.[2-4] ||
+| mixedOS    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.74.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
 
 
 ## How to Initialize
