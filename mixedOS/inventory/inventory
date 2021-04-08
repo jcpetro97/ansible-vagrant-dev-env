@@ -1,3 +1,0 @@
-ansible ansible_host=192.168.70.2
-client1 ansible_host=192.168.70.3
-client2 ansible_host=192.168.70.4

@@ -16,7 +16,9 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 | ubuntu1804 | jcpetro97/ubuntu1804                     | 192.168.71.[2-4] ||
 | centos7    | jcpetro97/centos7                        | 192.168.72.[2-4] ||
 | centos8    | jcpetro97/centos8                        | 192.168.73.[2-4] ||
-| mixedOS    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.74.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
+| mixedOS-ub2004    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.74.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
+| mixedOS-cent7    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.75.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
+| mixedOS-cent8    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.76.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
 
 
 ## How to Initialize
