@@ -1,0 +1,4 @@
+ansible ansible_host=192.168.74.2
+ubuntu2004 ansible_host=192.168.74.3
+centos7 ansible_host=192.168.74.4
+centos8 ansible_host=192.168.74.5

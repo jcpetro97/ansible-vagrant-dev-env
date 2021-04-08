@@ -1,0 +1,7 @@
+---
+# Below is an example of how to add a "role" to the requirements.yml file
+# If you are using it from the commandline, roles can be downloaded using the following galaxy command
+# ansible-galaxy install --force -r ./roles/requirements.yml   
+# NOTE:  --force will overwrite anr roles that is already in the roles directory
+#
+#- src: git+http://gitea.johnpetro.xyz/ansible/InstallStandardPackages
