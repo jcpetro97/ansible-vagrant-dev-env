@@ -1,5 +1,5 @@
 #!/bin/bash
-ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.18}
+ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.19}
 
 # Install Python.
 /bin/echo "------> installing python3 <------"
