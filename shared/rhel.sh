@@ -1,5 +1,5 @@
 #!/bin/bash
-ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.19}
+ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
 # Install Python.
 /usr/bin/echo "------> installing python3 <------"
 /usr/bin/yum -y install python3 python3-pip sshpass
