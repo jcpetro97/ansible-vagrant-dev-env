@@ -35,7 +35,7 @@ ex. `vagrant up server`
 
 **NOTE:** By default, when you spin up the server VM, it will install ansible from the 2.9.x tree.  If you want to use ansible from a different version tree, do the following:
 
-env ANSIBLE_VERSION=_version number_ vagrant up server
+env ANSIBLE_VERSION=_**version number**_ vagrant up server
 
 `env ANSIBLE_VERSION=2.10.4 vagrant up server`
 
