@@ -20,6 +20,7 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 | mixedOS-cent7    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.75.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
 | mixedOS-cent8    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.76.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
 
+**NOTE:** If you want a development environment where the control node OS is the same as the clients, those can be found in the **SingleOS** directory
 
 ## How to Initialize
 
