@@ -6,19 +6,21 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 ## Requirements
 
 * Virtualbox 
-* Knowledge of vagrant commands
 * Basic knowledge of an ansible project layout
+* Knowledge of vagrant commands
+* vagrant-hosts plugin installed
+
+`vagrant plugin install vagrant-hosts`
+
+
 ## OS/Vagrant Box/IP Information
 
-| OS         | vagrant box name                         | Private IP Range |Note|
-| ---------- | ---------------------------------------- | ---------------- |----|
-| ubuntu2004 | jcpetro97/ubuntu2004                     | 192.168.70.[2-4] ||
-| ubuntu1804 | jcpetro97/ubuntu1804                     | 192.168.71.[2-4] ||
-| centos7    | jcpetro97/centos7                        | 192.168.72.[2-4] ||
-| centos8    | jcpetro97/centos8                        | 192.168.73.[2-4] ||
-| mixedOS-ub2004    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.74.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
-| mixedOS-cent7    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.75.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
-| mixedOS-cent8    | jcpetro97/[centos7, centos8, ubuntu2004] | 192.168.76.[2-5] |Server is ubuntu2004, the clients are centos7, centos8, ubuntu2004|
+| OS         | vagrant box name                         | 
+| ---------- | ---------------------------------------- |
+| ubuntu2004 | jcpetro97/ubuntu2004                     |
+| centos7    | jcpetro97/centos7                        |
+| centos8    | jcpetro97/centos8                        |
+| mixedOS    | jcpetro97/[centos7, centos8, ubuntu2004] | 
 
 **NOTE:** If you want a development environment where the control node OS is the same as the clients, those can be found in the **SingleOS** directory
 
@@ -55,29 +57,28 @@ A basic ansible project structure is already there and it follows the ansible re
 
 Basically, develop the playbook/role on the host, inside the directory of the OS desired.  To test, spin up the server, and one or both clients.  Log into the "server", cd to /vagrant and run the ansible playbook.
 
-## How to add more clients
+## How to add more nodes
 
 * edit the Vagrantfile
-* at the end of the file, there is a comment that says `Add more client definitions here`  Beneath that line, paste the following:
+* change the following line  `(1..2).each do |i|`  and increment it to whatever you need
+* edit the inventory/vagrant file and add the additional entries that you need.  
+
+example:
 
 ```
-  config.vm.define :VMNAME do |VMNAME|
-    VMNAME.vm.box = "jcpetro97/ubuntu2004"
-    VMNAME.vm.hostname = "Change Hostname"
-    VMNAME.vm.network "private_network", ip: "ADD IP"
-    VMNAME.vm.provider "virtualbox" do |cl2|
-      cl2.memory = 1024
-      cl2.cpus = 1
-      cl2.gui = false
-      cl2.name = "VIRTUALBOX VM NAME"
-    end
-  end
+(1..4).each do |i|
+
+inventory/vagrant - add the following lines:
+
+OsName-node3
+OsName-node4
+
 ```
-* Change any of the fields labled VMNAME, to what the new VM will be called ( ie. client3)
-* Change "ADD IP" to the next IP in the private range
-* If you want a different OS, change `jcpetro97/ubuntu2004` to another box name from vagrant cloud ( ie. jcpetro97/centos8 or geerlingguy/debian10, etc)
-* edit the `./inventory/inventory` file, add the new vm and IP address.
-* run `vagrant status` to see if the new VM you want to create is listed
+
+* You can change the subnet by editing the SUBNET variable in the Vagrantfile.
+* If you want a different OS, change `jcpetro97/ubuntu2004` to another box name from vagrant cloud ( ie. jcpetro97/centos8 or geerlingguy/debian10, etc)  just edit the appropriate variable (OSNAME_IMAGE) in the vagrantfile.
+* The control nodes and "clients"  wil all be added to the VM's /etc/hosts files thanks to the vagtant-hosts plugin.
+* run `vagrant status` to see if the changes that were made are correct
 * If there are no errors, run `vagrant up <NEW VM NAME>`
 
 **NOTE:** I currently have the following vagrant boxes hosted at vagrant cloud: jcpetro97/centos7, jcpetro97/centos8, jcpetro97/ubuntu1804, jcpetro97/ubuntu2004.
