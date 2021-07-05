@@ -1,0 +1,152 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+UBUNTU_IMAGE = "jcpetro97/ubuntu2004"
+CENTOS7_IMAGE = "jcpetro97/centos7"
+CENTOS8_IMAGE = "jcpetro97/centos8"
+SUBNET = "192.168.10"
+Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
+  
+  # ubuntu control node
+  config.vm.define :"ubuntu-controlnode" do |ubcn|
+    ubcn.vm.box = UBUNTU_IMAGE
+    ubcn.vm.hostname = "ubuntu-controlnode"
+    ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
+    ubcn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    ubcn.vm.synced_folder '.', '/vagrant', disabled: false
+    ubcn.vm.provision :hosts, :sync_hosts => true
+    ubcn.vm.provision "shell" do |s|
+      s.inline = $ubinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # ubcn
+  
+  # centos7 control node
+  config.vm.define :"centos7-controlnode" do |c7cn|
+    c7cn.vm.box = CENTOS7_IMAGE
+    c7cn.vm.hostname = "centos7-controlnode"
+    c7cn.vm.network "private_network", ip: "#{SUBNET}.3"
+    c7cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    c7cn.vm.synced_folder '.', '/vagrant', disabled: false
+    c7cn.vm.provision :hosts, :sync_hosts => true
+    c7cn.vm.provision "shell" do |s|
+      s.inline = $centinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # c7cn
+  
+  # centos8 control node
+  config.vm.define :"centos8-controlnode" do |c8cn|
+    c8cn.vm.box = CENTOS8_IMAGE
+    c8cn.vm.hostname = "centos8-controlnode"
+    c8cn.vm.network "private_network", ip: "#{SUBNET}.4"
+    c8cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    c8cn.vm.synced_folder '.', '/vagrant', disabled: false
+    c8cn.vm.provision :hosts, :sync_hosts => true
+    c8cn.vm.provision "shell" do |s|
+      s.inline = $centinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # c8cn
+  
+  # ubuntu nodes
+  (1..2).each do |i|     
+    config.vm.define "ubuntu-node#{i}" do |ubuntu|
+        ubuntu.vm.box = UBUNTU_IMAGE 
+        ubuntu.vm.hostname = "ubuntu-node#{i}"       
+        ubuntu.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        ubuntu.vm.provision :hosts, :sync_hosts => true
+    end # end ubuntu
+  end  # end each loop
+
+  # centos7 nodes
+  (1..2).each do |i|     
+    config.vm.define "centos7-node#{i}" do |centos7|
+        centos7.vm.box = CENTOS7_IMAGE
+        centos7.vm.hostname = "centos7-node#{i}"       
+        centos7.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"     
+        centos7.vm.provision :hosts, :sync_hosts => true
+    end # end centos7
+  end # end each loop
+  
+  # centos8 nodes
+  (1..2).each do |i|     
+    config.vm.define "centos8-node#{i}" do |centos8|
+        centos8.vm.box = CENTOS8_IMAGE
+        centos8.vm.hostname = "centos8-node#{i}"       
+        centos8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+        centos8.vm.provision :hosts, :sync_hosts => true
+    end # end centos8 node
+  end # end each loop
+end # config
+$ubinstall = <<UBSCRIPT
+  #!/bin/bash
+  ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
+
+  # Install Python.
+  /bin/echo "------> installing python3 <------"
+  /usr/bin/apt update
+  /usr/bin/apt -y install python3 python3-pip sshpass
+  /bin/echo "------> upgrade pip <------"
+  /usr/bin/python3 -m pip install --upgrade pip
+  /bin/echo "------> upgrade setuptools <------"
+  /usr/bin/python3 -m pip install --upgrade setuptools
+  # # Install Ansible.
+  if [[ $ANSIBLE_VERSION =~ "2.9" ]]
+  then
+      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+
+  else
+      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+
+  fi
+  #
+  /bin/echo "------> Verify Ansible Version <------"
+  /usr/local/bin/ansible --version
+UBSCRIPT
+
+$centinstall = <<CENTSCRIPT
+  #!/bin/bash
+  ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
+  # Install Python.
+  /usr/bin/echo "------> installing python3 <------"
+  /usr/bin/yum -y install python3 python3-pip sshpass
+  /usr/bin/echo "------> upgrade pip <------"
+  /usr/bin/python3 -m pip install --upgrade pip
+  /usr/bin/echo "------> upgrade setuptools <------"
+  /usr/bin/python3 -m pip install --upgrade setuptools
+  # Install Ansible.
+  # # Install Ansible.
+  if [[ $ANSIBLE_VERSION =~ "2.9" ]]
+  then
+      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+
+  else    
+      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+
+  fi
+  #
+
+  /usr/bin/echo "------> Install Ansible 2.9 <------"
+  /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+  #
+  /usr/bin/echo "------> Verify Ansible Version <------"
+  /usr/local/bin/ansible --version
+CENTSCRIPT
