@@ -1,46 +1,67 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-VAGRANTFILE_API_VERSION = "2"
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.ssh.insert_key = false
-  config.vm.define :server do |cn|
-    cn.vm.box = "jcpetro97/centos8"
-    cn.vm.synced_folder '.', '/vagrant', disabled: false
-    cn.vm.hostname = "ansibledev"
-    cn.vm.network "private_network", ip: "192.168.73.2"
-    cn.vm.provider "virtualbox" do |tl2d|
-      tl2d.memory = 2048
-      tl2d.cpus = 2
-      tl2d.gui = false
-      tl2d.name = "centos8-ansibledev"
-    end
-    cn.vm.provision "shell" do |s|
-      s.path = "../../shared/rhel.sh"
-      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
-    end
-  end
-  config.vm.define :client1 do |client1|
-    client1.vm.box = "jcpetro97/centos8"
-    client1.vm.hostname = "Client1"
-    client1.vm.network "private_network", ip: "192.168.73.3"
-    client1.vm.provider "virtualbox" do |cl1|
-      cl1.memory = 1024
-      cl1.cpus = 1
-      cl1.gui = false
-      cl1.name = "centos8-Client1"
-    end
-  end
-  config.vm.define :client2 do |client2|
-    client2.vm.box = "jcpetro97/centos8"
-    client2.vm.hostname = "client2"
-    client2.vm.network "private_network", ip: "192.168.73.4"
-    client2.vm.provider "virtualbox" do |cl2|
-      cl2.memory = 1024
-      cl2.cpus = 1
-      cl2.gui = false
-      cl2.name = "centos8-client2"
-    end
-  end
-# Add more client definitions here
 
-end
+CENTOS8_IMAGE = "jcpetro97/centos8"
+SUBNET = "192.168.6"
+Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
+    
+  # centos8 control node
+  config.vm.define :"centos8-controlnode" do |c8cn|
+    c8cn.vm.box = CENTOS8_IMAGE
+    c8cn.vm.hostname = "centos8-controlnode"
+    c8cn.vm.network "private_network", ip: "#{SUBNET}.4"
+    c8cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    c8cn.vm.synced_folder '.', '/vagrant', disabled: false
+    c8cn.vm.provision :hosts, :sync_hosts => true
+    c8cn.vm.provision "shell" do |s|
+      s.inline = $centinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # c8cn
+  
+  # centos8 nodes
+  (1..2).each do |i|     
+    config.vm.define "centos8-node#{i}" do |centos8|
+        centos8.vm.box = CENTOS8_IMAGE
+        centos8.vm.hostname = "centos8-node#{i}"       
+        centos8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+        centos8.vm.provision :hosts, :sync_hosts => true
+    end # end centos8 node
+  end # end each loop
+end # config
+
+$centinstall = <<CENTSCRIPT
+  #!/bin/bash
+  ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
+  # Install Python.
+  /usr/bin/echo "------> installing python3 <------"
+  /usr/bin/yum -y install python3 python3-pip sshpass
+  /usr/bin/echo "------> upgrade pip <------"
+  /usr/bin/python3 -m pip install --upgrade pip
+  /usr/bin/echo "------> upgrade setuptools <------"
+  /usr/bin/python3 -m pip install --upgrade setuptools
+  # Install Ansible.
+  # # Install Ansible.
+  if [[ $ANSIBLE_VERSION =~ "2.9" ]]
+  then
+      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+
+  else    
+      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+
+  fi
+  #
+
+  /usr/bin/echo "------> Install Ansible 2.9 <------"
+  /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+  #
+  /usr/bin/echo "------> Verify Ansible Version <------"
+  /usr/local/bin/ansible --version
+CENTSCRIPT
