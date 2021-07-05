@@ -1,6 +1,6 @@
 # Ansible Development and Testing templates
 
-These are vagrant templates set up to do ansible development and testing.  Each OS ( listed below ) is set up with a control node, labled "server" and two clients labled "client1" and "client2"
+These are vagrant templates set up to do ansible development and testing.  Each OS ( listed below ) is set up with a control node, labled "OSName-controlnode" and two clients labled "OSName-node1" and "OSName-node2"
 
 Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other vagrant boxes, but it hasn't been tested.
 ## Requirements
@@ -70,8 +70,8 @@ example:
 
 inventory/vagrant - add the following lines:
 
-OsName-node3
-OsName-node4
+OSName-node3
+OSName-node4
 
 ```
 
