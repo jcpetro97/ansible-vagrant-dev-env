@@ -1,3 +1,0 @@
-roles/*
-.vagrant/
-!roles/requirements.yml
