@@ -5,3 +5,7 @@
 # NOTE:  --force will overwrite anr roles that is already in the roles directory
 #
 #- src: git+http://gitea.johnpetro.xyz/ansible/InstallStandardPackages
+#
+# If you need a specific version of branch, make the config entry like this:
+#   - src: git+https://gitea.johnpetro.xyz/john/<rolename>
+#     version: <branch name or version number>
