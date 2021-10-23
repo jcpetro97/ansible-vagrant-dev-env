@@ -41,6 +41,14 @@ env ANSIBLE_VERSION=_**VersionNumber**_ vagrant up server
 
 `env ANSIBLE_VERSION=2.10.4 vagrant up server`
 
+**NOTE:** If you are using powershell, execute the following instead of the command referenced above.
+
+```
+PS C:\Users\USERNAME\dvl>$env:ANSIBLE_VERSION="2.10.4"
+PS C:\Users\USERNAME\dvl>vagrant up server
+
+```
+
 _Spin up clients_
 
 `vagrant up client1`
