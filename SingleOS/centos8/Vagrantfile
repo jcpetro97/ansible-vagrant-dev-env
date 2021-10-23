@@ -37,7 +37,6 @@ end # config
 
 $centinstall = <<CENTSCRIPT
   #!/bin/bash
-  ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
   # Install Python.
   /usr/bin/echo "------> installing python3 <------"
   /usr/bin/yum -y install python3 python3-pip sshpass
@@ -46,22 +45,22 @@ $centinstall = <<CENTSCRIPT
   /usr/bin/echo "------> upgrade setuptools <------"
   /usr/bin/python3 -m pip install --upgrade setuptools
   # Install Ansible.
-  # # Install Ansible.
-  if [[ $ANSIBLE_VERSION =~ "2.9" ]]
-  then
-      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-      /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+  if [ -z "${ANSIBLE_VERSION}" ];
 
-  else    
-      /usr/bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-      /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+    then
+        /bin/echo "------> Install Latest Version of Ansible  <------"
+        /usr/bin/python3 -m pip install ansible
+    elif [[ $ANSIBLE_VERSION =~ "2.10" ]]
+    then
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+    else
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+    fi
 
-  fi
   #
 
-  /usr/bin/echo "------> Install Ansible 2.9 <------"
-  /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
-  #
   /usr/bin/echo "------> Verify Ansible Version <------"
   /usr/local/bin/ansible --version
 CENTSCRIPT

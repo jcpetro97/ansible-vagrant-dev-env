@@ -37,7 +37,6 @@ Vagrant.configure("2") do |config|
 end # config
 $ubinstall = <<UBSCRIPT
   #!/bin/bash
-  ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.9.22}
 
   # Install Python.
   /bin/echo "------> installing python3 <------"
@@ -47,17 +46,21 @@ $ubinstall = <<UBSCRIPT
   /usr/bin/python3 -m pip install --upgrade pip
   /bin/echo "------> upgrade setuptools <------"
   /usr/bin/python3 -m pip install --upgrade setuptools
-  # # Install Ansible.
-  if [[ $ANSIBLE_VERSION =~ "2.9" ]]
-  then
-      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-      /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+  # Install Ansible.
+  if [ -z "${ANSIBLE_VERSION}" ];
 
-  else
-      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-      /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+    then
+        /bin/echo "------> Install Latest Version of Ansible  <------"
+        /usr/bin/python3 -m pip install ansible
+    elif [[ $ANSIBLE_VERSION =~ "2.10" ]]
+    then
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+    else
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+    fi
 
-  fi
   #
   /bin/echo "------> Verify Ansible Version <------"
   /usr/local/bin/ansible --version

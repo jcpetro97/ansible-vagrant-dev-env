@@ -103,7 +103,7 @@ $ubinstall = <<UBSCRIPT
   /usr/bin/python3 -m pip install --upgrade pip
   /bin/echo "------> upgrade setuptools <------"
   /usr/bin/python3 -m pip install --upgrade setuptools
-  # # Install Ansible.
+  # Install Ansible.
   if [ -z "${ANSIBLE_VERSION}" ];
 
     then
