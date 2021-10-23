@@ -13,45 +13,46 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 `vagrant plugin install vagrant-hosts`
 
 
-## OS/Vagrant Box/IP Information
+## OS/Vagrant Box
 
 | OS         | vagrant box name                         | 
 | ---------- | ---------------------------------------- |
 | ubuntu2004 | jcpetro97/ubuntu2004                     |
 | centos7    | jcpetro97/centos7                        |
 | centos8    | jcpetro97/centos8                        |
-| mixedOS    | jcpetro97/[centos7, centos8, ubuntu2004] | 
 
-**NOTE:** If you want a development environment where the control node OS is the same as the clients, those can be found in the **SingleOS** directory
+**NOTE:** There are ansible control nodes and clients defined for each OS
 
 ## How to Initialize
 
 * Clone this repository to your local machine
-* cd into the OS directory you want to use
+* Either start development here, or move the VagrantFile to an existing **Ansible Project Directory** and work on it from there.  
+
+**NOTE:** To do the development, you need to set up an ansible project directory, based on the Ansible best practices.  When you clone this repository, it will be set up just like the "alternate" method documented on the ansible website. 
 
 _Spin up the ansible server_
 
 * vagrant up <VM name>
 
-ex. `vagrant up server`
+ex. `vagrant up ubuntu-controlnode`
 
-**NOTE:** By default, when you spin up the server VM, it will install ansible from the 2.9.x tree.  If you want to use ansible from a different version tree, do the following:
+**NOTE:** By default, when you spin up the controlnode VM, it will install the latest released ansile version in the pip repository.  If you want to use ansible from a different version tree, do the following:
 
-env ANSIBLE_VERSION=_**VersionNumber**_ vagrant up server
+env ANSIBLE_VERSION=_**VersionNumber**_ vagrant up <OS name>-controlnode
 
-`env ANSIBLE_VERSION=2.10.4 vagrant up server`
+`env ANSIBLE_VERSION=4.0.3 vagrant up server`
 
 **NOTE:** If you are using powershell, execute the following instead of the command referenced above.
 
 ```
-PS C:\Users\USERNAME\dvl>$env:ANSIBLE_VERSION="2.10.4"
-PS C:\Users\USERNAME\dvl>vagrant up server
+PS C:\Users\USERNAME\dvl>$env:ANSIBLE_VERSION="4.0.3"
+PS C:\Users\USERNAME\dvl>vagrant up <OS name>-controlnode
 
 ```
 
-_Spin up clients_
+_Spin up clients (nodes)_
 
-`vagrant up client1`
+`vagrant up ubuntu-node1`
 
 **NOTE:** If you can put the name of the second client on the command line, just separate the VM names by a space.
 
