@@ -12,6 +12,23 @@ Boxes are retrieved from Vagrant Cloud.  These templates _MAY_ work with other v
 
 `vagrant plugin install vagrant-hosts`
 
+**NOTE:** Linux/MacOS hosts can only have a total of 128 HostOnly networks defined.  In Virtualbox 6.1.30, they started to enforce that limitation. By default the allowed HostOnly ranges are 192.168.56.0/21 ( 192.168.56 -> 192.168.63).  The valid networks can be changed. To change the subnets, do the following:
+
+* create/edit the file `/etc/vbox/networks.conf`
+* add the following options inside the file ( including the * )
+
+```
+* 192.168.0.0/16
+```
+
+This will add all of the entire 192.168.0 range.  You can also add multiple subnets by changing the entry to this:
+
+```
+* 192.168.0.56/21 192.168.10.0/24
+```
+
+**WARNING:** if you add the `/etc/vbox/networks.conf` file but don't put any content inside it, Virtualbox will not allow ANY HostOnly networks to be created.
+
 
 ## OS/Vagrant Box
 
