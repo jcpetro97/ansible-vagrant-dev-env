@@ -4,7 +4,8 @@
 UBUNTU_IMAGE = "jcpetro97/ubuntu2004"
 CENTOS7_IMAGE = "jcpetro97/centos7"
 CENTOS8_IMAGE = "jcpetro97/centos8"
-SUBNET = "192.168.10"
+# valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
+SUBNET = "192.168.56"
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
   
