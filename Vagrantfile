@@ -3,7 +3,7 @@
 
 UBUNTU_IMAGE = "jcpetro97/ubuntu2004"
 CENTOS7_IMAGE = "jcpetro97/centos7"
-CENTOS8_IMAGE = "jcpetro97/centos8"
+ROCKY8_IMAGE = "jcpetro97/rocky8"
 # valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
 SUBNET = "192.168.56"
 Vagrant.configure("2") do |config|
@@ -46,18 +46,18 @@ Vagrant.configure("2") do |config|
   end # c7cn
   
   # centos8 control node
-  config.vm.define :"centos8-controlnode" do |c8cn|
-    c8cn.vm.box = CENTOS8_IMAGE
-    c8cn.vm.hostname = "centos8-controlnode"
-    c8cn.vm.network "private_network", ip: "#{SUBNET}.4"
-    c8cn.vm.provider "virtualbox" do |vb|
+  config.vm.define :"rocky8-controlnode" do |r8cn|
+    r8cn.vm.box = ROCKY8_IMAGE
+    r8cn.vm.hostname = "rocky8-controlnode"
+    r8cn.vm.network "private_network", ip: "#{SUBNET}.4"
+    r8cn.vm.provider "virtualbox" do |vb|
       vb.memory = 2048
       vb.cpus = 2
       vb.gui = false
     end #vb
-    c8cn.vm.synced_folder '.', '/vagrant', disabled: false
-    c8cn.vm.provision :hosts, :sync_hosts => true
-    c8cn.vm.provision "shell" do |s|
+    r8cn.vm.synced_folder '.', '/vagrant', disabled: false
+    r8cn.vm.provision :hosts, :sync_hosts => true
+    r8cn.vm.provision "shell" do |s|
       s.inline = $centinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
@@ -83,13 +83,13 @@ Vagrant.configure("2") do |config|
     end # end centos7
   end # end each loop
   
-  # centos8 nodes
+  # rocky8 nodes
   (1..2).each do |i|     
-    config.vm.define "centos8-node#{i}" do |centos8|
-        centos8.vm.box = CENTOS8_IMAGE
-        centos8.vm.hostname = "centos8-node#{i}"       
-        centos8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
-        centos8.vm.provision :hosts, :sync_hosts => true
+    config.vm.define "rocky8-node#{i}" do |rocky8|
+        rocky8.vm.box = ROCKY8_IMAGE
+        rocky8.vm.hostname = "rocky-node#{i}"       
+        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+        rocky8.vm.provision :hosts, :sync_hosts => true
     end # end centos8 node
   end # end each loop
 end # config
