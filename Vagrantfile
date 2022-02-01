@@ -87,7 +87,7 @@ Vagrant.configure("2") do |config|
   (1..2).each do |i|     
     config.vm.define "rocky8-node#{i}" do |rocky8|
         rocky8.vm.box = ROCKY8_IMAGE
-        rocky8.vm.hostname = "rocky-node#{i}"       
+        rocky8.vm.hostname = "rocky8-node#{i}"       
         rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
         rocky8.vm.provision :hosts, :sync_hosts => true
     end # end centos8 node
