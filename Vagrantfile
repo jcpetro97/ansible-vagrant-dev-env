@@ -1,7 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
-UBUNTU_IMAGE = "jcpetro97/ubuntu2004"
+DEBIAN10_IMAGE = "jcpetro97/debian10"
+DEBIAN11_IMAGE = "jcpetro97/debian11"
+UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
+UBUNTU2204_IMAGE = "jcpetro97/ubuntu2004"
 CENTOS7_IMAGE = "jcpetro97/centos7"
 ROCKY8_IMAGE = "jcpetro97/rocky8"
 # valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
@@ -9,9 +11,9 @@ SUBNET = "192.168.56"
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
   
-  # ubuntu control node
+# ubuntu control node
   config.vm.define :"ubuntu-controlnode" do |ubcn|
-    ubcn.vm.box = UBUNTU_IMAGE
+    ubcn.vm.box = UBUNTU2004_IMAGE
     ubcn.vm.hostname = "ubuntu-controlnode"
     ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
     ubcn.vm.provider "virtualbox" do |vb|
@@ -25,9 +27,8 @@ Vagrant.configure("2") do |config|
       s.inline = $ubinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
-  end # ubcn
-  
-  # centos7 control node
+  end # ubcn  
+# centos7 control node
   config.vm.define :"centos7-controlnode" do |c7cn|
     c7cn.vm.box = CENTOS7_IMAGE
     c7cn.vm.hostname = "centos7-controlnode"
@@ -43,9 +44,8 @@ Vagrant.configure("2") do |config|
       s.inline = $centinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
-  end # c7cn
-  
-  # centos8 control node
+  end # c7cn  
+# centos8 control node
   config.vm.define :"rocky8-controlnode" do |r8cn|
     r8cn.vm.box = ROCKY8_IMAGE
     r8cn.vm.hostname = "rocky8-controlnode"
@@ -61,37 +61,68 @@ Vagrant.configure("2") do |config|
       s.inline = $centinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
-  end # c8cn
-  
-  # ubuntu nodes
+  end # c8cn  
+# ubuntu2004 nodes
   (1..2).each do |i|     
-    config.vm.define "ubuntu-node#{i}" do |ubuntu|
-        ubuntu.vm.box = UBUNTU_IMAGE 
-        ubuntu.vm.hostname = "ubuntu-node#{i}"       
-        ubuntu.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
-        ubuntu.vm.provision :hosts, :sync_hosts => true
-    end # end ubuntu
+    config.vm.define "ubuntu2004-node#{i}" do |ubuntu2004|
+        ubuntu2004.vm.box = UBUNTU2004_IMAGE 
+        ubuntu2004.vm.hostname = "ubuntu2004-node#{i}"       
+        ubuntu2004.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        ubuntu2004.vm.provision :hosts, :sync_hosts => true
+        ubuntu2004.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end ubuntu2004
   end  # end each loop
-
-  # centos7 nodes
+# ubuntu2204 nodes
+    (1..2).each do |i|     
+      config.vm.define "ubuntu2204-node#{i}" do |ubuntu2204|
+        ubuntu2204.vm.box = UBUNTU2204_IMAGE 
+        ubuntu2204.vm.hostname = "ubuntu2204-node#{i}"       
+        ubuntu2204.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"
+        ubuntu2204.vm.provision :hosts, :sync_hosts => true
+        ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
+      end # end ubuntu2204
+    end  # end each loop
+# centos7 nodes
   (1..2).each do |i|     
     config.vm.define "centos7-node#{i}" do |centos7|
         centos7.vm.box = CENTOS7_IMAGE
         centos7.vm.hostname = "centos7-node#{i}"       
-        centos7.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"     
+        centos7.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
         centos7.vm.provision :hosts, :sync_hosts => true
+        centos7.vm.synced_folder '.', '/vagrant', disabled: true
     end # end centos7
-  end # end each loop
-  
-  # rocky8 nodes
+  end # end each loop  
+# rocky8 nodes
   (1..2).each do |i|     
     config.vm.define "rocky8-node#{i}" do |rocky8|
         rocky8.vm.box = ROCKY8_IMAGE
         rocky8.vm.hostname = "rocky8-node#{i}"       
-        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 40}"     
         rocky8.vm.provision :hosts, :sync_hosts => true
-    end # end centos8 node
+        rocky8.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end rocky8 node
   end # end each loop
+# debian10 nodes
+  (1..2).each do |i|     
+    config.vm.define "debian10-node#{i}" do |debian10|
+      debian10.vm.box = DEBIAN10_IMAGE
+      debian10.vm.hostname = "debian10-node#{i}"       
+      debian10.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
+      debian10.vm.provision :hosts, :sync_hosts => true
+      debian10.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end debian10 node
+  end # end each loop
+# debian11 nodes
+(1..2).each do |i|     
+  config.vm.define "debian11-node#{i}" do |debian11|
+    debian11.vm.box = DEBIAN11_IMAGE
+    debian11.vm.hostname = "debian11-node#{i}"       
+    debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
+    debian11.vm.provision :hosts, :sync_hosts => true
+    debian11.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end debian10 node
+end # end each loop
+
 end # config
 $ubinstall = <<UBSCRIPT
   #!/bin/bash
