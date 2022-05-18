@@ -3,7 +3,7 @@
 DEBIAN10_IMAGE = "jcpetro97/debian10"
 DEBIAN11_IMAGE = "jcpetro97/debian11"
 UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
-UBUNTU2204_IMAGE = "jcpetro97/ubuntu2004"
+UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204"
 CENTOS7_IMAGE = "jcpetro97/centos7"
 ROCKY8_IMAGE = "jcpetro97/rocky8"
 # valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
