@@ -1,0 +1,73 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+DEBIAN10_IMAGE = "jcpetro97/debian10"
+DEBIAN11_IMAGE = "jcpetro97/debian11"
+UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
+UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204"
+CENTOS7_IMAGE = "jcpetro97/centos7"
+ROCKY8_IMAGE = "jcpetro97/rocky8"
+# valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
+SUBNET = "192.168.57"
+Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
+  
+# ubuntu control node
+  config.vm.define :"controlnode" do |ubcn|
+    ubcn.vm.box = UBUNTU2004_IMAGE
+    ubcn.vm.hostname = "controlnode"
+    ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
+    ubcn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    ubcn.vm.synced_folder '.', '/vagrant', disabled: false
+    ubcn.vm.provision :hosts, :sync_hosts => true
+    ubcn.vm.provision "shell" do |s|
+      s.inline = $ubinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # ubcn  
+# xubuntu2204 nodes
+    (1..2).each do |i|     
+      config.vm.define "node#{i}" do |xubuntu2204|
+        xubuntu2204.vm.box = XUBUNTU2204_IMAGE 
+        xubuntu2204.vm.gui = true
+        xubuntu2204.vm.hostname = "node#{i}"       
+        xubuntu2204.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        xubuntu2204.vm.provision :hosts, :sync_hosts => true
+        xubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
+      end # end ubuntu2204
+    end  # end each loop
+end # end each loop
+end # config
+$ubinstall = <<UBSCRIPT
+  #!/bin/bash
+
+  # Install Python.
+  /bin/echo "------> installing python3 <------"
+  /usr/bin/apt update
+  /usr/bin/apt -y install python3 python3-pip sshpass
+  /bin/echo "------> upgrade pip <------"
+  /usr/bin/python3 -m pip install --upgrade pip
+  /bin/echo "------> upgrade setuptools <------"
+  /usr/bin/python3 -m pip install --upgrade setuptools
+  # Install Ansible.
+  if [ -z "${ANSIBLE_VERSION}" ];
+
+    then
+        /bin/echo "------> Install Latest Version of Ansible  <------"
+        /usr/bin/python3 -m pip install ansible
+    elif [[ $ANSIBLE_VERSION =~ "2.10" ]]
+    then
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+    else
+        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+        /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+    fi
+    
+  #
+  /bin/echo "------> Verify Ansible Version <------"
+  /usr/local/bin/ansible --version
+UBSCRIPT
