@@ -6,6 +6,7 @@ UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
 UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204"
 CENTOS7_IMAGE = "jcpetro97/centos7"
 ROCKY8_IMAGE = "jcpetro97/rocky8"
+ROCKY9_IMAGE = "jcpetro97/rocky9"
 # valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
 SUBNET = "192.168.56"
 Vagrant.configure("2") do |config|
@@ -45,7 +46,7 @@ Vagrant.configure("2") do |config|
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
   end # c7cn  
-# centos8 control node
+# rocky8 control node
   config.vm.define :"rocky8-controlnode" do |r8cn|
     r8cn.vm.box = ROCKY8_IMAGE
     r8cn.vm.hostname = "rocky8-controlnode"
@@ -61,7 +62,25 @@ Vagrant.configure("2") do |config|
       s.inline = $centinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
-  end # c8cn  
+  end # rocky8 control node  
+ # rocky9 control node
+ config.vm.define :"rocky9-controlnode" do |r9cn|
+  r9cn.vm.box = ROCKY9_IMAGE
+  r9cn.vm.hostname = "rocky9-controlnode"
+  r9cn.vm.network "private_network", ip: "#{SUBNET}.5"
+  r9cn.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.gui = false
+  end #vb
+  r9cn.vm.synced_folder '.', '/vagrant', disabled: false
+  r9cn.vm.provision :hosts, :sync_hosts => true
+  r9cn.vm.provision "shell" do |s|
+    s.inline = $centinstall
+    s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+  end # s
+end # rocky9 controlnode  
+
 # ubuntu2004 nodes
   (1..2).each do |i|     
     config.vm.define "ubuntu2004-node#{i}" do |ubuntu2004|
@@ -102,12 +121,22 @@ Vagrant.configure("2") do |config|
         rocky8.vm.synced_folder '.', '/vagrant', disabled: true
     end # end rocky8 node
   end # end each loop
+# rocky9 nodes
+(1..2).each do |i|     
+  config.vm.define "rocky9-node#{i}" do |rocky9|
+      rocky9.vm.box = ROCKY9_IMAGE
+      rocky9.vm.hostname = "rocky9-node#{i}"       
+      rocky9.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
+      rocky9.vm.provision :hosts, :sync_hosts => true
+      rocky9.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end rocky9 node
+end # end each loop
 # debian10 nodes
   (1..2).each do |i|     
     config.vm.define "debian10-node#{i}" do |debian10|
       debian10.vm.box = DEBIAN10_IMAGE
       debian10.vm.hostname = "debian10-node#{i}"       
-      debian10.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
+      debian10.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
       debian10.vm.provision :hosts, :sync_hosts => true
       debian10.vm.synced_folder '.', '/vagrant', disabled: true
     end # end debian10 node
@@ -117,7 +146,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "debian11-node#{i}" do |debian11|
     debian11.vm.box = DEBIAN11_IMAGE
     debian11.vm.hostname = "debian11-node#{i}"       
-    debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
+    debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"     
     debian11.vm.provision :hosts, :sync_hosts => true
     debian11.vm.synced_folder '.', '/vagrant', disabled: true
   end # end debian10 node
