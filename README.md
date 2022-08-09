@@ -35,7 +35,7 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 | OS            | vagrant box name     |
 | ------------- | -------------------- |
 | ubuntu2004    | jcpetro97/ubuntu2004 |
-| ubuntu2004    | jcpetro97/ubuntu2204 |
+| ubuntu2204    | jcpetro97/ubuntu2204 |
 | centos7       | jcpetro97/centos7    |
 | Rocky Linux 8 | jcpetro97/rocky8     |
 | Rocky Linux 9 | jcpetro97/rocky9     |
