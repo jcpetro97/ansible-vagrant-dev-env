@@ -29,28 +29,28 @@ Vagrant.configure("2") do |config|
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
   end # ubcn  
-# centos7 control node
-  config.vm.define :"centos7-controlnode" do |c7cn|
-    c7cn.vm.box = CENTOS7_IMAGE
-    c7cn.vm.hostname = "centos7-controlnode"
-    c7cn.vm.network "private_network", ip: "#{SUBNET}.3"
-    c7cn.vm.provider "virtualbox" do |vb|
-      vb.memory = 2048
-      vb.cpus = 2
-      vb.gui = false
-    end #vb
-    c7cn.vm.synced_folder '.', '/vagrant', disabled: false
-    c7cn.vm.provision :hosts, :sync_hosts => true
-    c7cn.vm.provision "shell" do |s|
-      s.inline = $centinstall
-      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
-    end # s
-  end # c7cn  
+# # centos7 control node
+#   config.vm.define :"centos7-controlnode" do |c7cn|
+#     c7cn.vm.box = CENTOS7_IMAGE
+#     c7cn.vm.hostname = "centos7-controlnode"
+#     c7cn.vm.network "private_network", ip: "#{SUBNET}.3"
+#     c7cn.vm.provider "virtualbox" do |vb|
+#       vb.memory = 2048
+#       vb.cpus = 2
+#       vb.gui = false
+#     end #vb
+#     c7cn.vm.synced_folder '.', '/vagrant', disabled: false
+#     c7cn.vm.provision :hosts, :sync_hosts => true
+#     c7cn.vm.provision "shell" do |s|
+#       s.inline = $centinstall
+#       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+#     end # s
+#   end # c7cn  
 # rocky8 control node
   config.vm.define :"rocky8-controlnode" do |r8cn|
     r8cn.vm.box = ROCKY8_IMAGE
     r8cn.vm.hostname = "rocky8-controlnode"
-    r8cn.vm.network "private_network", ip: "#{SUBNET}.4"
+    r8cn.vm.network "private_network", ip: "#{SUBNET}.3"
     r8cn.vm.provider "virtualbox" do |vb|
       vb.memory = 2048
       vb.cpus = 2
@@ -67,7 +67,7 @@ Vagrant.configure("2") do |config|
  config.vm.define :"rocky9-controlnode" do |r9cn|
   r9cn.vm.box = ROCKY9_IMAGE
   r9cn.vm.hostname = "rocky9-controlnode"
-  r9cn.vm.network "private_network", ip: "#{SUBNET}.5"
+  r9cn.vm.network "private_network", ip: "#{SUBNET}.4"
   r9cn.vm.provider "virtualbox" do |vb|
     vb.memory = 2048
     vb.cpus = 2

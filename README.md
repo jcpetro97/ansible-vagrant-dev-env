@@ -32,13 +32,17 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 
 ## OS/Vagrant Box
 
-| OS         | vagrant box name                         | 
-| ---------- | ---------------------------------------- |
-| ubuntu2004 | jcpetro97/ubuntu2004                     |
-| centos7    | jcpetro97/centos7                        |
-| centos8    | jcpetro97/centos8                        |
+| OS            | vagrant box name     |
+| ------------- | -------------------- |
+| ubuntu2004    | jcpetro97/ubuntu2004 |
+| ubuntu2004    | jcpetro97/ubuntu2204 |
+| centos7       | jcpetro97/centos7    |
+| Rocky Linux 8 | jcpetro97/rocky8     |
+| Rocky Linux 9 | jcpetro97/rocky9     |
+| Debian 10     | jcpetro97/debian10   |
+| Debian 11     | jcpetro97/debian11   |
 
-**NOTE:** There are ansible control nodes and clients defined for each OS
+**NOTE:** There are ansible control nodes and clients defined for `Ubuntu 2004`, `Rocky Linux 8` and `Rocky Linux 9`.
 
 ## How to Initialize
 
@@ -106,5 +110,3 @@ OSName-node4
 * The control nodes and "clients"  wil all be added to the VM's /etc/hosts files thanks to the vagtant-hosts plugin.
 * run `vagrant status` to see if the changes that were made are correct
 * If there are no errors, run `vagrant up <NEW VM NAME>`
-
-**NOTE:** I currently have the following vagrant boxes hosted at vagrant cloud: jcpetro97/centos7, jcpetro97/centos8, jcpetro97/ubuntu1804, jcpetro97/ubuntu2004.
