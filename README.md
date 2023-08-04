@@ -36,11 +36,11 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 | ------------- | -------------------- |
 | ubuntu2004    | jcpetro97/ubuntu2004 |
 | ubuntu2204    | jcpetro97/ubuntu2204 |
-| centos7       | jcpetro97/centos7    |
 | Rocky Linux 8 | jcpetro97/rocky8     |
 | Rocky Linux 9 | jcpetro97/rocky9     |
 | Debian 10     | jcpetro97/debian10   |
 | Debian 11     | jcpetro97/debian11   |
+| Debian 12     | jcpetro97/debian12   |
 
 **NOTE:** There are ansible control nodes and clients defined for `Ubuntu 2004`, `Rocky Linux 8` and `Rocky Linux 9`.
 
