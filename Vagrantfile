@@ -2,9 +2,10 @@
 # vi: set ft=ruby :
 DEBIAN10_IMAGE = "jcpetro97/debian10"
 DEBIAN11_IMAGE = "jcpetro97/debian11"
+DEBIAN12_IMAGE = "jcpetro97/debian12"
 UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
 UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204"
-CENTOS7_IMAGE = "jcpetro97/centos7"
+#OPENSUSE15_IMAGE = "jcpetro97/opensuse15"
 ROCKY8_IMAGE = "jcpetro97/rocky8"
 ROCKY9_IMAGE = "jcpetro97/rocky9"
 # valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
@@ -29,23 +30,6 @@ Vagrant.configure("2") do |config|
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
   end # ubcn  
-# # centos7 control node
-#   config.vm.define :"centos7-controlnode" do |c7cn|
-#     c7cn.vm.box = CENTOS7_IMAGE
-#     c7cn.vm.hostname = "centos7-controlnode"
-#     c7cn.vm.network "private_network", ip: "#{SUBNET}.3"
-#     c7cn.vm.provider "virtualbox" do |vb|
-#       vb.memory = 2048
-#       vb.cpus = 2
-#       vb.gui = false
-#     end #vb
-#     c7cn.vm.synced_folder '.', '/vagrant', disabled: false
-#     c7cn.vm.provision :hosts, :sync_hosts => true
-#     c7cn.vm.provision "shell" do |s|
-#       s.inline = $centinstall
-#       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
-#     end # s
-#   end # c7cn  
 # rocky8 control node
   config.vm.define :"rocky8-controlnode" do |r8cn|
     r8cn.vm.box = ROCKY8_IMAGE
@@ -101,16 +85,16 @@ end # rocky9 controlnode
         ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
       end # end ubuntu2204
     end  # end each loop
-# centos7 nodes
-  (1..2).each do |i|     
-    config.vm.define "centos7-node#{i}" do |centos7|
-        centos7.vm.box = CENTOS7_IMAGE
-        centos7.vm.hostname = "centos7-node#{i}"       
-        centos7.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
-        centos7.vm.provision :hosts, :sync_hosts => true
-        centos7.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end centos7
-  end # end each loop  
+# # opensuse15 nodes - This is a placeholder for now
+#   (1..2).each do |i|     
+#     config.vm.define "opensuse15-node#{i}" do |opensuse15|
+#         opensuse15.vm.box = OPENSUSE15_IMAGE
+#         opensuse15.vm.hostname = "opensuse15-node#{i}"       
+#         opensuse15.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+#         opensuse15.vm.provision :hosts, :sync_hosts => true
+#         opensuse15.vm.synced_folder '.', '/vagrant', disabled: true
+#     end # end opensuse15
+#   end # end each loop  
 # rocky8 nodes
   (1..2).each do |i|     
     config.vm.define "rocky8-node#{i}" do |rocky8|
@@ -149,7 +133,17 @@ end # end each loop
     debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"     
     debian11.vm.provision :hosts, :sync_hosts => true
     debian11.vm.synced_folder '.', '/vagrant', disabled: true
-  end # end debian10 node
+  end # end debian11 node
+end # end each loop
+# debian12 nodes
+(1..2).each do |i|     
+  config.vm.define "debian12-node#{i}" do |debian12|
+    debian12.vm.box = DEBIAN12_IMAGE
+    debian12.vm.hostname = "debian12-node#{i}"       
+    debian12.vm.network :private_network, ip: "#{SUBNET}.#{i + 80}"     
+    debian12.vm.provision :hosts, :sync_hosts => true
+    debian12.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end debian12 node
 end # end each loop
 
 end # config

@@ -3,8 +3,8 @@ ubuntu2004-node1
 ubuntu2004-node2
 ubuntu2204-node1
 ubuntu2204-node2
-centos7-node1
-centos7-node2
+opensuse15-node1
+opensuse15-node2
 rocky8-node1
 rocky8-node2
 rocky9-node1
@@ -13,5 +13,7 @@ debian10-node1
 debian10-node2
 debian11-node1
 debian11-node2
+debian12-node1
+debian12-node2
 xubuntu2204-1
 xubuntu2204-2
