@@ -1,0 +1,197 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+DEBIAN10_IMAGE = "jcpetro97/debian10"
+DEBIAN11_IMAGE = "jcpetro97/debian11"
+DEBIAN12_IMAGE = "jcpetro97/debian12"
+UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004"
+UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204"
+#OPENSUSE15_IMAGE = "jcpetro97/opensuse15"
+ROCKY8_IMAGE = "jcpetro97/rocky8"
+ROCKY9_IMAGE = "jcpetro97/rocky9"
+# valid subnets are 192.168.56 -> 192.168.63. See README.md on adding different subnets.
+SUBNET = "192.168.56"
+Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
+  
+# ubuntu control node
+  config.vm.define :"ubuntu-controlnode" do |ubcn|
+    ubcn.vm.box = UBUNTU2004_IMAGE
+    ubcn.vm.hostname = "ubuntu-controlnode"
+    ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
+    ubcn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    ubcn.vm.synced_folder '.', '/vagrant', disabled: false
+    ubcn.vm.provision :hosts, :sync_hosts => true
+    ubcn.vm.provision "shell" do |s|
+      s.inline = $ubinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # ubcn  
+# rocky8 control node
+  config.vm.define :"rocky8-controlnode" do |r8cn|
+    r8cn.vm.box = ROCKY8_IMAGE
+    r8cn.vm.hostname = "rocky8-controlnode"
+    r8cn.vm.network "private_network", ip: "#{SUBNET}.3"
+    r8cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    r8cn.vm.synced_folder '.', '/vagrant', disabled: false
+    r8cn.vm.provision :hosts, :sync_hosts => true
+    r8cn.vm.provision "shell" do |s|
+      s.inline = $centinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+  end # rocky8 control node  
+ # rocky9 control node
+ config.vm.define :"rocky9-controlnode" do |r9cn|
+  r9cn.vm.box = ROCKY9_IMAGE
+  r9cn.vm.hostname = "rocky9-controlnode"
+  r9cn.vm.network "private_network", ip: "#{SUBNET}.4"
+  r9cn.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.gui = false
+  end #vb
+  r9cn.vm.synced_folder '.', '/vagrant', disabled: false
+  r9cn.vm.provision :hosts, :sync_hosts => true
+  r9cn.vm.provision "shell" do |s|
+    s.inline = $centinstall
+    s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+  end # s
+end # rocky9 controlnode  
+
+# ubuntu2004 nodes
+  (1..2).each do |i|     
+    config.vm.define "ubuntu2004-node#{i}" do |ubuntu2004|
+        ubuntu2004.vm.box = UBUNTU2004_IMAGE 
+        ubuntu2004.vm.hostname = "ubuntu2004-node#{i}"       
+        ubuntu2004.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        ubuntu2004.vm.provision :hosts, :sync_hosts => true
+        ubuntu2004.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end ubuntu2004
+  end  # end each loop
+# ubuntu2204 nodes
+    (1..2).each do |i|     
+      config.vm.define "ubuntu2204-node#{i}" do |ubuntu2204|
+        ubuntu2204.vm.box = UBUNTU2204_IMAGE 
+        ubuntu2204.vm.hostname = "ubuntu2204-node#{i}"       
+        ubuntu2204.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"
+        ubuntu2204.vm.provision :hosts, :sync_hosts => true
+        ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
+      end # end ubuntu2204
+    end  # end each loop
+# # opensuse15 nodes - This is a placeholder for now
+#   (1..2).each do |i|     
+#     config.vm.define "opensuse15-node#{i}" do |opensuse15|
+#         opensuse15.vm.box = OPENSUSE15_IMAGE
+#         opensuse15.vm.hostname = "opensuse15-node#{i}"       
+#         opensuse15.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"     
+#         opensuse15.vm.provision :hosts, :sync_hosts => true
+#         opensuse15.vm.synced_folder '.', '/vagrant', disabled: true
+#     end # end opensuse15
+#   end # end each loop  
+# rocky8 nodes
+  (1..2).each do |i|     
+    config.vm.define "rocky8-node#{i}" do |rocky8|
+        rocky8.vm.box = ROCKY8_IMAGE
+        rocky8.vm.hostname = "rocky8-node#{i}"       
+        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 40}"     
+        rocky8.vm.provision :hosts, :sync_hosts => true
+        rocky8.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end rocky8 node
+  end # end each loop
+# rocky9 nodes
+(1..2).each do |i|     
+  config.vm.define "rocky9-node#{i}" do |rocky9|
+      rocky9.vm.box = ROCKY9_IMAGE
+      rocky9.vm.hostname = "rocky9-node#{i}"       
+      rocky9.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
+      rocky9.vm.provision :hosts, :sync_hosts => true
+      rocky9.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end rocky9 node
+end # end each loop
+# debian10 nodes
+  (1..2).each do |i|     
+    config.vm.define "debian10-node#{i}" do |debian10|
+      debian10.vm.box = DEBIAN10_IMAGE
+      debian10.vm.hostname = "debian10-node#{i}"       
+      debian10.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
+      debian10.vm.provision :hosts, :sync_hosts => true
+      debian10.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end debian10 node
+  end # end each loop
+# debian11 nodes
+(1..2).each do |i|     
+  config.vm.define "debian11-node#{i}" do |debian11|
+    debian11.vm.box = DEBIAN11_IMAGE
+    debian11.vm.hostname = "debian11-node#{i}"       
+    debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"     
+    debian11.vm.provision :hosts, :sync_hosts => true
+    debian11.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end debian11 node
+end # end each loop
+# debian12 nodes
+(1..2).each do |i|     
+  config.vm.define "debian12-node#{i}" do |debian12|
+    debian12.vm.box = DEBIAN12_IMAGE
+    debian12.vm.hostname = "debian12-node#{i}"       
+    debian12.vm.network :private_network, ip: "#{SUBNET}.#{i + 80}"     
+    debian12.vm.provision :hosts, :sync_hosts => true
+    debian12.vm.synced_folder '.', '/vagrant', disabled: true
+  end # end debian12 node
+end # end each loop
+
+end # config
+$ubinstall = <<UBSCRIPT
+  #!/bin/bash
+
+  # Install Python.
+  /bin/echo "------> installing python3 <------"
+  /usr/bin/apt update
+  /usr/bin/apt -y install python3 python3-pip sshpass
+  /bin/echo "------> upgrade pip <------"
+  su -c '/usr/bin/python3 -m pip install --no-warn-script-location --upgrade pip' vagrant
+  /bin/echo "------> upgrade setuptools <------"
+  su -c '/usr/bin/python3 -m pip install --no-warn-script-location --upgrade setuptools' vagrant
+  # Install Ansible.
+  if [ -z "${ANSIBLE_VERSION}" ];
+    then
+      /bin/echo "------> Install Latest Version of Ansible  <------"
+      su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible' vagrant
+    else
+      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible==$ANSIBLE_VERSION' vagrant
+    fi
+    
+  #
+  /bin/echo "------> Verify Ansible Version <------"
+  su -c '~vagrant/.local/bin/ansible --version' vagrant
+UBSCRIPT
+
+$centinstall = <<CENTSCRIPT
+  #!/bin/bash
+  # Install Python.
+  /usr/bin/echo "------> installing python3 <------"
+  /usr/bin/yum -y install python3 python3-pip sshpass
+  /usr/bin/echo "------> upgrade pip <------"
+  su -c '/usr/bin/python3 -m pip install --no-warn-script-location --upgrade pip' vagrant
+  /usr/bin/echo "------> upgrade setuptools <------"
+  su -c '/usr/bin/python3 -m pip install --no-warn-script-location --upgrade setuptools' vagrant
+  # Install Ansible.
+  if [ -z "${ANSIBLE_VERSION}" ];
+    then
+        /bin/echo "------> Install Latest Version of Ansible  <------"
+        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible' vagrant
+    else
+      /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
+      su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible==$ANSIBLE_VERSION' vagrant
+    fi
+  # 
+  /usr/bin/echo "------> Verify Ansible Version <------"
+  su -c '~vagrant/.local/bin/ansible --version' vagrant
+CENTSCRIPT
