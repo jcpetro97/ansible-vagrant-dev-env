@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
             docker.create_args = ["--cgroupns=host"]
         end # docker    
         ubcn.vm.synced_folder '.', '/vagrant', disabled: false
-        ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
+        ubcn.vm.network :private_network, type: "dhcp", docker_network__internal: true
         ubcn.vm.provision :hosts, :sync_hosts => true
         ubcn.vm.provision "shell" do |s|
           s.inline = $ubinstall
@@ -45,7 +45,7 @@ config.vm.define :"rocky8-controlnode" do |rky8cn|
         docker.create_args = ["--cgroupns=host"]
     end # docker    
     rky8cn.vm.synced_folder '.', '/vagrant', disabled: false
-    rky8cn.vm.network "private_network", ip: "#{SUBNET}.3"
+    rky8cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
     rky8cn.vm.provision :hosts, :sync_hosts => true
     rky8cn.vm.provision "shell" do |s|
       s.inline = $rockyinstall
@@ -65,7 +65,7 @@ config.vm.define :"rocky9-controlnode" do |rky9cn|
         docker.create_args = ["--cgroupns=host"]
     end # docker    
     rky9cn.vm.synced_folder '.', '/vagrant', disabled: false
-    rky9cn.vm.network "private_network", ip: "#{SUBNET}.4"
+    rky9cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
     rky9cn.vm.provision :hosts, :sync_hosts => true
     rky9cn.vm.provision "shell" do |s|
       s.inline = $rockyinstall
@@ -87,7 +87,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        ubuntu2004.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        ubuntu2004.vm.network :private_network, type: "dhcp", docker_network__internal: true
         ubuntu2004.vm.provision :hosts, :sync_hosts => true
         ubuntu2004.vm.synced_folder '.', '/vagrant', disabled: true
     end # end ubuntu2004
@@ -105,7 +105,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        ubuntu2204.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"
+        ubuntu2204.vm.network :private_network, type: "dhcp", docker_network__internal: true
         ubuntu2204.vm.provision :hosts, :sync_hosts => true
         ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
     end # end ubuntu2204
@@ -123,7 +123,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        opensuse15.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"
+        opensuse15.vm.network :private_network, type: "dhcp", docker_network__internal: true
         opensuse15.vm.provision :hosts, :sync_hosts => true
         opensuse15.vm.synced_folder '.', '/vagrant', disabled: true
     end # end opensuse15
@@ -141,7 +141,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 40}"
+        rocky8.vm.network :private_network, type: "dhcp", docker_network__internal: true
         rocky8.vm.provision :hosts, :sync_hosts => true
         rocky8.vm.synced_folder '.', '/vagrant', disabled: true
     end # end rocky8
@@ -159,7 +159,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        rocky9.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"
+        rocky9.vm.network :private_network, type: "dhcp", docker_network__internal: true
         rocky9.vm.provision :hosts, :sync_hosts => true
         rocky9.vm.synced_folder '.', '/vagrant', disabled: true
     end # end rocky9
@@ -177,7 +177,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        debian10.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"
+        debian10.vm.network :private_network, type: "dhcp", docker_network__internal: true
         debian10.vm.provision :hosts, :sync_hosts => true
         debian10.vm.synced_folder '.', '/vagrant', disabled: true
     end # end debian10
@@ -195,7 +195,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        debian11.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"
+        debian11.vm.network :private_network, type: "dhcp", docker_network__internal: true
         debian11.vm.provision :hosts, :sync_hosts => true
         debian11.vm.synced_folder '.', '/vagrant', disabled: true
     end # end debian11
@@ -213,7 +213,7 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        debian12.vm.network :private_network, ip: "#{SUBNET}.#{i + 80}"
+        debian12.vm.network :private_network, type: "dhcp", docker_network__internal: true
         debian12.vm.provision :hosts, :sync_hosts => true
         debian12.vm.synced_folder '.', '/vagrant', disabled: true
     end # end debian12
@@ -237,19 +237,18 @@ $ubinstall = <<UBSCRIPT
 
     then
         /bin/echo "------> Install Latest Version of Ansible  <------"
-        /usr/bin/python3 -m pip install ansible
-    elif [[ $ANSIBLE_VERSION =~ "2.10" ]]
-    then
-        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-        /usr/bin/python3 -m pip install ansible-base==$ANSIBLE_VERSION
+        #/usr/bin/python3 -m pip install ansible
+        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible' vagrant
     else
         /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-        /usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+        #/usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
+        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible==$ANSIBLE_VERSION' vagrant
     fi
     
   #
   /bin/echo "------> Verify Ansible Version <------"
-  /usr/local/bin/ansible --version
+  #/usr/local/bin/ansible --version
+  su -c '~vagrant/.local/bin/ansible --version' vagrant
 UBSCRIPT
 
 $rockyinstall = <<ROCKYSCRIPT
@@ -265,16 +264,14 @@ $rockyinstall = <<ROCKYSCRIPT
   if [ -z "${ANSIBLE_VERSION}" ];
     then
         /bin/echo "------> Install Latest Version of Ansible  <------"
-        /usr/bin/pip3.11 install ansible
-    elif [[ $ANSIBLE_VERSION =~ "2.10" ]]
-    then
-        /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-        /usr/bin/pip3.11 install ansible-base==$ANSIBLE_VERSION
+        su -c '/usr/bin/pip3.11 install --no-warn-script-location --user ansible' vagrant
     else
         /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
-        /usr/bin/pip3.11 install ansible==$ANSIBLE_VERSION
+        su -c '/usr/bin/pip3.11 install --no-warn-script-location --user ansible==$ANSIBLE_VERSION' vagrant
     fi
   # 
   /usr/bin/echo "------> Verify Ansible Version <------"
-  /usr/local/bin/ansible --version
+  #/usr/local/bin/ansible --version
+   su -c '~vagrant/.local/bin/ansible --version' vagrant
+
 ROCKYSCRIPT
