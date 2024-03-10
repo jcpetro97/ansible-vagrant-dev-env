@@ -63,7 +63,7 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 
 * Clone this repository to your local machine
 * If you want to use Virtualbox, no other contifuration is needed
-* If you want to use docker, then rename Vagrantfile to Vagrantfile.virtualbox ( in case it's needed later) then rename Vagrantfile.docker to Vagrantfile
+* If you want to use docker, then delete Vagrantfile.  Then either copy Vagrantfile.docker to Vagrantfile. ( The default confguration uses the `Vagrantfile.virtualbox` file for Vagrantfile )
 * Either start development here, or move the VagrantFile to an existing **Ansible Project Directory** and work on it from there.  
 
 **NOTE:** To do the development, you need to set up an ansible project directory, based on the Ansible best practices.  When you clone this repository, it will be set up just like the "alternate" method documented on the ansible website. 
