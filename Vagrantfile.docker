@@ -2,11 +2,10 @@
 # vi: set ft=ruby :
 UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004-vagrant:latest"
 UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204-vagrant:latest"
-OPENSUSE15_IMAGE = "jcpetro97/opensuse15-vagrang:latest"
+UBUNTU2404_IMAGE = "jcpetro97/ubuntu2404-vagrant:latest"
+OPENSUSE15_IMAGE = "jcpetro97/opensuse15-vagrant:latest"
 ROCKY8_IMAGE = "jcpetro97/rocky8-vagrant:latest"
 ROCKY9_IMAGE = "jcpetro97/rocky9-vagrant:latest"
-DEBIAN10_IMAGE = "jcpetro97/debian10-vagrant:latest"
-DEBIAN11_IMAGE = "jcpetro97/debian11-vagrant:latest"
 DEBIAN12_IMAGE = "jcpetro97/debian12-vagrant:latest"
 #
 SUBNET = "192.168.29"
@@ -17,7 +16,7 @@ Vagrant.configure("2") do |config|
     config.vm.define :"ubuntu-controlnode" do |ubcn|        
         ubcn.vm.hostname = "ubuntu-controlnode"
         ubcn.vm.provider :docker do |docker|
-            docker.image = UBUNTU2004_IMAGE
+            docker.image = UBUNTU2404_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
             docker.privileged = true
@@ -32,26 +31,6 @@ Vagrant.configure("2") do |config|
           s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}     
         end #ubinstall
     end # ubuntu-controlnode
-
-# rocky8-controlnode
-config.vm.define :"rocky8-controlnode" do |rky8cn|        
-    rky8cn.vm.hostname = "rocky8-controlnode"
-    rky8cn.vm.provider :docker do |docker|
-        docker.image = ROCKY8_IMAGE
-        docker.remains_running = true
-        docker.has_ssh = true
-        docker.privileged = true
-        docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
-        docker.create_args = ["--cgroupns=host"]
-    end # docker    
-    rky8cn.vm.synced_folder '.', '/vagrant', disabled: false
-    rky8cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
-    rky8cn.vm.provision :hosts, :sync_hosts => true
-    rky8cn.vm.provision "shell" do |s|
-      s.inline = $rockyinstall
-      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}     
-    end #rky8install
-end # rocky8-controlnode
 
 # rocky9-controlnode
 config.vm.define :"rocky9-controlnode" do |rky9cn|        
@@ -111,6 +90,24 @@ end # rocky9-controlnode
     end # end ubuntu2204
   end  # end each do
 
+# ubuntu2404 nodes
+(1..2).each do |i|     
+    config.vm.define "ubuntu2404-node#{i}" do |ubuntu2404|     
+        ubuntu2404.vm.hostname = "ubuntu2404-node#{i}"   
+        ubuntu2404.vm.provider :docker do |docker|
+            docker.image = UBUNTU2404_IMAGE
+            docker.remains_running = true
+            docker.has_ssh = true
+            docker.privileged = true
+            docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
+            docker.create_args = ["--cgroupns=host"]
+        end # docker    
+        ubuntu2404.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        ubuntu2404.vm.provision :hosts, :sync_hosts => true
+        ubuntu2404.vm.synced_folder '.', '/vagrant', disabled: true
+    end # end ubuntu2404
+  end  # end each do
+
 # opensuse15 nodes
 (1..2).each do |i|     
     config.vm.define "opensuse15-node#{i}" do |opensuse15|     
@@ -165,42 +162,6 @@ end # rocky9-controlnode
     end # end rocky9
   end  # end each do
   
-# debian10 nodes
-(1..2).each do |i|     
-    config.vm.define "debian10-node#{i}" do |debian10|     
-        debian10.vm.hostname = "debian10-node#{i}"   
-        debian10.vm.provider :docker do |docker|
-            docker.image = DEBIAN10_IMAGE
-            docker.remains_running = true
-            docker.has_ssh = true
-            docker.privileged = true
-            docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
-            docker.create_args = ["--cgroupns=host"]
-        end # docker    
-        debian10.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        debian10.vm.provision :hosts, :sync_hosts => true
-        debian10.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end debian10
-  end  # end each do
-
-# debian11 nodes
-(1..2).each do |i|     
-    config.vm.define "debian11-node#{i}" do |debian11|     
-        debian11.vm.hostname = "debian11-node#{i}"   
-        debian11.vm.provider :docker do |docker|
-            docker.image = DEBIAN11_IMAGE
-            docker.remains_running = true
-            docker.has_ssh = true
-            docker.privileged = true
-            docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
-            docker.create_args = ["--cgroupns=host"]
-        end # docker    
-        debian11.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        debian11.vm.provision :hosts, :sync_hosts => true
-        debian11.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end debian11
-  end  # end each do
-
 # debian12 nodes
 (1..2).each do |i|     
     config.vm.define "debian12-node#{i}" do |debian12|     
@@ -247,7 +208,6 @@ $ubinstall = <<UBSCRIPT
     
   #
   /bin/echo "------> Verify Ansible Version <------"
-  #/usr/local/bin/ansible --version
   su -c '~vagrant/.local/bin/ansible --version' vagrant
 UBSCRIPT
 
@@ -256,10 +216,6 @@ $rockyinstall = <<ROCKYSCRIPT
   # Install Python.
   /usr/bin/echo "------> installing python3 <------"
   /usr/bin/dnf -y install python3.11 python3.11-pip sshpass langpacks-en glibc-all-langpacks
-  # /usr/bin/echo "------> upgrade pip <------"
-  # /usr/bin/python3 -m pip install --upgrade pip
-  # /usr/bin/echo "------> upgrade setuptools <------"
-  # /usr/bin/python3 -m pip install --upgrade setuptools
   # Install Ansible.
   if [ -z "${ANSIBLE_VERSION}" ];
     then
@@ -271,7 +227,6 @@ $rockyinstall = <<ROCKYSCRIPT
     fi
   # 
   /usr/bin/echo "------> Verify Ansible Version <------"
-  #/usr/local/bin/ansible --version
    su -c '~vagrant/.local/bin/ansible --version' vagrant
 
 ROCKYSCRIPT
