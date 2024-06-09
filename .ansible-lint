@@ -1,0 +1,11 @@
+skip_list:
+  - 'yaml'
+  - 'role-name'
+  - 'var-naming'
+  - 'package-latest'
+  - 'no-handler'
+  - "no-free-form"
+  - "risky-shell-pipe"
+  - "command-instead-of-shell"
+warn_list:
+  - 'risky-file-permissions'
