@@ -36,10 +36,9 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 | ------------- | -------------------- |
 | ubuntu2004    | jcpetro97/ubuntu2004 |
 | ubuntu2204    | jcpetro97/ubuntu2204 |
+| ubuntu2404    | jcpetro97/ubuntu2404 |
 | Rocky Linux 8 | jcpetro97/rocky8     |
 | Rocky Linux 9 | jcpetro97/rocky9     |
-| Debian 10     | jcpetro97/debian10   |
-| Debian 11     | jcpetro97/debian11   |
 | Debian 12     | jcpetro97/debian12   |
 
 **NOTE:** There are ansible control nodes and clients defined for `Ubuntu 2004`, `Rocky Linux 8` and `Rocky Linux 9`.
@@ -50,11 +49,10 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 | ---------------- | ---------------------------- |
 | ubuntu2004       | jcpetro97/ubuntu2004-vagrant |
 | ubuntu2204       | jcpetro97/ubuntu2204-vagrant |
+| ubuntu2404       | jcpetro97/ubuntu2404-vagrant |
 | Rocky Linux 8    | jcpetro97/rocky8-vagrant     |
 | Rocky Linux 9    | jcpetro97/rocky9-vagrant     |
 | Opensuse Leap 15 | jcpetro97/opensuse15-vagrant |
-| Debian 10        | jcpetro97/debian10-vagrant   |
-| Debian 11        | jcpetro97/debian11-vagrant   |
 | Debian 12        | jcpetro97/debian12-vagrant   |
 
 **NOTE:** There are ansible control nodes and clients defined for `Ubuntu 2004`, `Rocky Linux 8` and `Rocky Linux 9`.
