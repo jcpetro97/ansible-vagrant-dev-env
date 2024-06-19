@@ -29,6 +29,7 @@ Vagrant.configure("2") do |config|
       s.inline = $ubinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
+    ubcn.vm.provision "file", source: "setup/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
   end # ubcn  
  # rocky9 control node
  config.vm.define :"rocky9-controlnode" do |r9cn|
@@ -43,9 +44,10 @@ Vagrant.configure("2") do |config|
   r9cn.vm.synced_folder '.', '/vagrant', disabled: false
   r9cn.vm.provision :hosts, :sync_hosts => true
   r9cn.vm.provision "shell" do |s|
-    s.inline = $centinstall
+    s.inline = $rhinstall
     s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
   end # s
+  r9cn.vm.provision "file", source: "setup/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
 end # rocky9 controlnode  
 
 # ubuntu2004 nodes
@@ -147,7 +149,7 @@ $ubinstall = <<UBSCRIPT
   su -c '~vagrant/.local/bin/ansible --version' vagrant
 UBSCRIPT
 
-$centinstall = <<CENTSCRIPT
+$rhinstall = <<RHSCRIPT
   #!/bin/bash
   # Install Python.
   /usr/bin/echo "------> installing python3 <------"
@@ -168,4 +170,4 @@ $centinstall = <<CENTSCRIPT
   # 
   /usr/bin/echo "------> Verify Ansible Version <------"
   su -c '~vagrant/.local/bin/ansible --version' vagrant
-CENTSCRIPT
+RHSCRIPT

@@ -47,7 +47,7 @@ config.vm.define :"rocky9-controlnode" do |rky9cn|
     rky9cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
     rky9cn.vm.provision :hosts, :sync_hosts => true
     rky9cn.vm.provision "shell" do |s|
-      s.inline = $rockyinstall
+      s.inline = $rhinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}     
     end #rky9install
 end # rocky9-controlnode
@@ -211,7 +211,7 @@ $ubinstall = <<UBSCRIPT
   su -c '~vagrant/.local/bin/ansible --version' vagrant
 UBSCRIPT
 
-$rockyinstall = <<ROCKYSCRIPT
+$rhinstall = <<RHSCRIPT
   #!/bin/bash
   # Install Python.
   /usr/bin/echo "------> installing python3 <------"
@@ -229,4 +229,4 @@ $rockyinstall = <<ROCKYSCRIPT
   /usr/bin/echo "------> Verify Ansible Version <------"
    su -c '~vagrant/.local/bin/ansible --version' vagrant
 
-ROCKYSCRIPT
+RHSCRIPT
