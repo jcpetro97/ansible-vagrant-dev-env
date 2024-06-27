@@ -5,39 +5,24 @@
   pre_tasks:
     - name: Copy Vagrant pub key to /etc/sshkeys.local
       ansible.builtin.copy:
-        src: /vagrant/vagrant.pub
+        src: /vagrant/files/vagrant.pub
         dest: /etc/sshkeys.local/
         mode: 0644
         directory_mode: 0755
   roles:
-    - role: ssh_cert_auth
     - role: UserManage
       vars:
         users_groups:
-          - name: ansible
-            gid: 671
+          - name: ansibletest
+            gid: 672
             state: present
         users:
-          - name: ansible
+          - name: ansibletest
             comment: Ansible User
-            uid: 671
-            group: ansible
+            uid: 672
+            group: ansibletest
             append: "no"
             sudo: yes
             update_password: on_create
             state: present
-          # - name: jxpsys
-          #   comment: John Petro
-          #   uid: 56827
-          #   group: users
-          #   append: "no"
-          #   update_password: on_create
-          #   state: present
     - role: sshd  
-  # post_tasks:
-  #   - name: Copy new sudoers file to /etc/sudoers
-  #     ansible.builtin.copy:
-  #       src: /vagrant/rit-sudoers
-  #       dest: /etc/sudoers
-  #       mode: 0440
-  #       backup: yes

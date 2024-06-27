@@ -14,111 +14,136 @@ Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
   
 # ubuntu control node
-  config.vm.define :"ubuntu-controlnode" do |ubcn|
-    ubcn.vm.box = UBUNTU2404_IMAGE
-    ubcn.vm.hostname = "ubuntu-controlnode"
-    ubcn.vm.network "private_network", ip: "#{SUBNET}.2"
-    ubcn.vm.provider "virtualbox" do |vb|
+  config.vm.define :"ubuntu-controlnode" do |cn|
+    cn.vm.box = UBUNTU2404_IMAGE
+    cn.vm.hostname = "ubuntu-controlnode"
+    cn.vm.network "private_network", ip: "#{SUBNET}.2"
+    cn.vm.provider "virtualbox" do |vb|
       vb.memory = 2048
       vb.cpus = 2
       vb.gui = false
     end #vb
-    ubcn.vm.synced_folder '.', '/vagrant', disabled: false
-    ubcn.vm.provision :hosts, :sync_hosts => true
-    ubcn.vm.provision "shell" do |s|
+    cn.vm.synced_folder '.', '/vagrant', disabled: false
+    cn.vm.provision :hosts, :sync_hosts => true
+    cn.vm.provision "shell" do |s|
       s.inline = $ubinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
     end # s
-    ubcn.vm.provision "file", source: "setup/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
-  end # ubcn  
- # rocky9 control node
- config.vm.define :"rocky9-controlnode" do |r9cn|
-  r9cn.vm.box = ROCKY9_IMAGE
-  r9cn.vm.hostname = "rocky9-controlnode"
-  r9cn.vm.network "private_network", ip: "#{SUBNET}.3"
-  r9cn.vm.provider "virtualbox" do |vb|
-    vb.memory = 2048
-    vb.cpus = 2
-    vb.gui = false
-  end #vb
-  r9cn.vm.synced_folder '.', '/vagrant', disabled: false
-  r9cn.vm.provision :hosts, :sync_hosts => true
-  r9cn.vm.provision "shell" do |s|
-    s.inline = $rhinstall
-    s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
-  end # s
-  r9cn.vm.provision "file", source: "setup/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
-end # rocky9 controlnode  
+    cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
+    cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+  end # cn  
+
+ # RedHat control node
+ config.vm.define :"redhat-controlnode" do |cn|
+    cn.vm.box = ROCKY9_IMAGE
+    cn.vm.hostname = "rocky9-controlnode"
+    cn.vm.network "private_network", ip: "#{SUBNET}.3"
+    cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+      vb.gui = false
+    end #vb
+    config.vm.synced_folder '.', '/vagrant', disabled: false
+    cn.vm.provision :hosts, :sync_hosts => true
+    cn.vm.provision "shell" do |s|
+      s.inline = $rhinstall
+      s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}
+    end # s
+    cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
+    cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+  end # redhat controlnode  
 
 # ubuntu2004 nodes
   (1..2).each do |i|     
-    config.vm.define "ubuntu2004-node#{i}" do |ubuntu2004|
-        ubuntu2004.vm.box = UBUNTU2004_IMAGE 
-        ubuntu2004.vm.hostname = "ubuntu2004-node#{i}"       
-        ubuntu2004.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
-        ubuntu2004.vm.provision :hosts, :sync_hosts => true
-        ubuntu2004.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end ubuntu2004
+    config.vm.define "ubuntu2004-node#{i}" do |node|
+        node.vm.box = UBUNTU2004_IMAGE 
+        node.vm.hostname = "ubuntu2004-node#{i}"       
+        node.vm.network :private_network, ip: "#{SUBNET}.#{i + 10}"
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "apt update ; apt install -y ansible"
+    end # end node
   end  # end each loop
+
 # ubuntu2204 nodes
     (1..2).each do |i|     
-      config.vm.define "ubuntu2204-node#{i}" do |ubuntu2204|
-        ubuntu2204.vm.box = UBUNTU2204_IMAGE 
-        ubuntu2204.vm.hostname = "ubuntu2204-node#{i}"       
-        ubuntu2204.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"
-        ubuntu2204.vm.provision :hosts, :sync_hosts => true
-        ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
+      config.vm.define "ubuntu2204-node#{i}" do |node|
+        node.vm.box = UBUNTU2204_IMAGE 
+        node.vm.hostname = "ubuntu2204-node#{i}"       
+        node.vm.network :private_network, ip: "#{SUBNET}.#{i + 20}"
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
       end # end ubuntu2204
     end  # end each loop
+
 # ubuntu2404 nodes
     (1..2).each do |i|     
-      config.vm.define "ubuntu2404-node#{i}" do |ubuntu2404|
-        ubuntu2404.vm.box = UBUNTU2404_IMAGE 
-        ubuntu2404.vm.hostname = "ubuntu2404-node#{i}"       
-        ubuntu2404.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"
-        ubuntu2404.vm.provision :hosts, :sync_hosts => true
-        ubuntu2404.vm.synced_folder '.', '/vagrant', disabled: true
-      end # end ubuntu2404
+      config.vm.define "ubuntu2404-node#{i}" do |node|
+        node.vm.box = UBUNTU2404_IMAGE 
+        node.vm.hostname = "ubuntu2404-node#{i}"       
+        node.vm.network :private_network, ip: "#{SUBNET}.#{i + 30}"
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+      end # end node
     end  # end each loop
 
 # # opensuse15 nodes - This is a placeholder for now
 #   (1..2).each do |i|     
-#     config.vm.define "opensuse15-node#{i}" do |opensuse15|
-#         opensuse15.vm.box = OPENSUSE15_IMAGE
-#         opensuse15.vm.hostname = "opensuse15-node#{i}"       
-#         opensuse15.vm.network :private_network, ip: "#{SUBNET}.#{i + 40}"     
-#         opensuse15.vm.provision :hosts, :sync_hosts => true
-#         opensuse15.vm.synced_folder '.', '/vagrant', disabled: true
-#     end # end opensuse15
+#     config.vm.define "opensuse15-node#{i}" do |node|
+#         node.vm.box = OPENSUSE15_IMAGE
+#         node.vm.hostname = "opensuse15-node#{i}"       
+#         node.vm.network :private_network, ip: "#{SUBNET}.#{i + 40}"     
+#         node.vm.provision :hosts, :sync_hosts => true
+#         node.vm.synced_folder '.', '/vagrant', disabled: false
+#         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+#         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+#     end # end node
 #   end # end each loop  
+
 # rocky8 nodes
   (1..2).each do |i|     
-    config.vm.define "rocky8-node#{i}" do |rocky8|
-        rocky8.vm.box = ROCKY8_IMAGE
-        rocky8.vm.hostname = "rocky8-node#{i}"       
-        rocky8.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
-        rocky8.vm.provision :hosts, :sync_hosts => true
-        rocky8.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end rocky8 node
+    config.vm.define "rocky8-node#{i}" do |node|
+        node.vm.box = ROCKY8_IMAGE
+        node.vm.hostname = "rocky8-node#{i}"       
+        node.vm.network :private_network, ip: "#{SUBNET}.#{i + 50}"     
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+    end # end node node
   end # end each loop
+
 # rocky9 nodes
 (1..2).each do |i|     
-  config.vm.define "rocky9-node#{i}" do |rocky9|
-      rocky9.vm.box = ROCKY9_IMAGE
-      rocky9.vm.hostname = "rocky9-node#{i}"       
-      rocky9.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
-      rocky9.vm.provision :hosts, :sync_hosts => true
-      rocky9.vm.synced_folder '.', '/vagrant', disabled: true
-  end # end rocky9 node
+  config.vm.define "rocky9-node#{i}" do |node|
+      node.vm.box = ROCKY9_IMAGE
+      node.vm.hostname = "rocky9-node#{i}"       
+      node.vm.network :private_network, ip: "#{SUBNET}.#{i + 60}"     
+      node.vm.provision :hosts, :sync_hosts => true
+      node.vm.synced_folder '.', '/vagrant', disabled: false
+      node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+      node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+  end # end node node
 end # end each loop
+
 # debian12 nodes
 (1..2).each do |i|     
-  config.vm.define "debian12-node#{i}" do |debian12|
-    debian12.vm.box = DEBIAN12_IMAGE
-    debian12.vm.hostname = "debian12-node#{i}"       
-    debian12.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"     
-    debian12.vm.provision :hosts, :sync_hosts => true
-    debian12.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.define "debian12-node#{i}" do |node|
+      node.vm.box = DEBIAN12_IMAGE
+      node.vm.hostname = "debian12-node#{i}"       
+      node.vm.network :private_network, ip: "#{SUBNET}.#{i + 70}"     
+      node.vm.provision :hosts, :sync_hosts => true
+      node.vm.synced_folder '.', '/vagrant', disabled: false
+      node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+      node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
   end # end debian12 node
 end # end each loop
 
