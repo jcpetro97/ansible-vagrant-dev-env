@@ -228,7 +228,6 @@ $hostsetup = <<HOSTSETUP
           systemctl restart sshd.service
       fi
   else 
-      # sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
       sed -i '/AuthorizedKeysFile/c\AuthorizedKeysFile /etc/sshkeys/%u.pub /etc/sshkeys.local/%u.pub' /etc/ssh/sshd_config
       if [ -f /etc/redhat-release ] ; then
           echo "restarting ssh on a RedHat based system"
