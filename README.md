@@ -3,6 +3,9 @@
 These are vagrant templates set up to do ansible development and testing.  Each OS ( listed below ) is set up with a control node, labled "OSName-controlnode" and two clients labled "OSName-node1" and "OSName-node2"
 
 Boxes for Virtualbox are retrieved from Vagrant Cloud.  The docker based images are retrieved from docker hub.  These templates _MAY_ work with other vagrant boxes, but it hasn't been tested.
+
+When the vagrant boxes are deployed, they will have an _ansibletest_ user added to the host, as well as configuring ssh to reference public keys in /etc/sshkeys.local and the ssh public keys for vagrant and ansibletest both copied into /etc/sshkeys.local.
+
 ## Requirements
 
 * Virtualbox or Docker-ce
@@ -45,15 +48,15 @@ This will add all of the entire 192.168.0 range.  You can also add multiple subn
 
 ## OS/Vagrant Docker Images
 
-| OS               | vagrant box name             |
-| ---------------- | ---------------------------- |
-| ubuntu2004       | jcpetro97/ubuntu2004-vagrant |
-| ubuntu2204       | jcpetro97/ubuntu2204-vagrant |
-| ubuntu2404       | jcpetro97/ubuntu2404-vagrant |
-| Rocky Linux 8    | jcpetro97/rocky8-vagrant     |
-| Rocky Linux 9    | jcpetro97/rocky9-vagrant     |
-| Opensuse Leap 15 | jcpetro97/opensuse15-vagrant |
-| Debian 12        | jcpetro97/debian12-vagrant   |
+| OS               | vagrant box name                 |
+| ---------------- | -------------------------------- |
+| ubuntu2004       | jcpetro97/ubuntu2004-vagrant     |
+| ubuntu2204       | jcpetro97/ubuntu2204-vagrant     |
+| ubuntu2404       | jcpetro97/ubuntu2404-vagrant     |
+| Rocky Linux 8    | jcpetro97/rocky8-vagrant         |
+| Rocky Linux 9    | jcpetro97/rocky9-vagrant         |
+| Opensuse Leap 15 | jcpetro97/opensuseleap15-vagrant |
+| Debian 12        | jcpetro97/debian12-vagrant       |
 
 **NOTE:** There are ansible control nodes and clients defined for `Ubuntu 2004`, `Rocky Linux 8` and `Rocky Linux 9`.
 
