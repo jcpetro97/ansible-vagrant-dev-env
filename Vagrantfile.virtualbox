@@ -32,6 +32,9 @@ Vagrant.configure("2") do |config|
     cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
     cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
     cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: $hostsetup
+    
   end # cn  
 
  # RedHat control node
@@ -53,6 +56,8 @@ Vagrant.configure("2") do |config|
     cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
     cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
     cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: $hostsetup
   end # redhat controlnode  
 
 # ubuntu2004 nodes
@@ -65,7 +70,8 @@ Vagrant.configure("2") do |config|
         node.vm.synced_folder '.', '/vagrant', disabled: false
         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
-        node.vm.provision "shell", inline: "apt update ; apt install -y ansible"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end node
   end  # end each loop
 
@@ -79,6 +85,8 @@ Vagrant.configure("2") do |config|
         node.vm.synced_folder '.', '/vagrant', disabled: false
         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
       end # end ubuntu2204
     end  # end each loop
 
@@ -92,6 +100,8 @@ Vagrant.configure("2") do |config|
         node.vm.synced_folder '.', '/vagrant', disabled: false
         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
       end # end node
     end  # end each loop
 
@@ -105,6 +115,8 @@ Vagrant.configure("2") do |config|
 #         node.vm.synced_folder '.', '/vagrant', disabled: false
 #         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
 #         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+#         node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+#         node.vm.provision "shell", inline: $hostsetup
 #     end # end node
 #   end # end each loop  
 
@@ -118,6 +130,8 @@ Vagrant.configure("2") do |config|
         node.vm.synced_folder '.', '/vagrant', disabled: false
         node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
         node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end node node
   end # end each loop
 
@@ -131,6 +145,8 @@ Vagrant.configure("2") do |config|
       node.vm.synced_folder '.', '/vagrant', disabled: false
       node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
       node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+      node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+      node.vm.provision "shell", inline: $hostsetup
   end # end node node
 end # end each loop
 
@@ -144,6 +160,8 @@ end # end each loop
       node.vm.synced_folder '.', '/vagrant', disabled: false
       node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
       node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+      node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+      node.vm.provision "shell", inline: $hostsetup
   end # end debian12 node
 end # end each loop
 
@@ -196,3 +214,31 @@ $rhinstall = <<RHSCRIPT
   /usr/bin/echo "------> Verify Ansible Version <------"
   su -c '~vagrant/.local/bin/ansible --version' vagrant
 RHSCRIPT
+
+$hostsetup = <<HOSTSETUP
+  #!/bin/bash
+  # Check to see if /etc/ssh/sshd_config.d exists
+  if [ -d /etc/ssh/sshd_config.d ] ; then
+      /usr/bin/cp /vagrant/files/pubkeys.conf /etc/ssh/sshd_config.d/02-pubkeys.conf  
+      if [ ! -f /etc/redhat-release ] ; then
+          echo "restarting ssh on a Debian based system"
+          systemctl restart ssh.service
+      else
+          echo "restarting ssh on a RedHat based system" 
+          systemctl restart sshd.service
+      fi
+  else 
+      # sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
+      sed -i '/AuthorizedKeysFile/c\AuthorizedKeysFile /etc/sshkeys/%u.pub /etc/sshkeys.local/%u.pub' /etc/ssh/sshd_config
+      if [ -f /etc/redhat-release ] ; then
+          echo "restarting ssh on a RedHat based system"
+          systemctl restart sshd.service
+      else
+          echo "restarting ssh on a Debian based system" 
+          systemctl restart ssh.service
+      fi
+  fi
+  useradd -m -s /bin/bash -c "Ansible TEST Service Account" ansibletest
+  echo "ansibletest ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/ansibletest
+  chmod 440 /etc/sudoers.d/ansibletest
+HOSTSETUP

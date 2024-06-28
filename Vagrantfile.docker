@@ -3,7 +3,7 @@
 UBUNTU2004_IMAGE = "jcpetro97/ubuntu2004-vagrant:latest"
 UBUNTU2204_IMAGE = "jcpetro97/ubuntu2204-vagrant:latest"
 UBUNTU2404_IMAGE = "jcpetro97/ubuntu2404-vagrant:latest"
-OPENSUSE15_IMAGE = "jcpetro97/opensuse15-vagrant:latest"
+OPENSUSE15_IMAGE = "jcpetro97/opensuseleap15-vagrant:latest"
 ROCKY8_IMAGE = "jcpetro97/rocky8-vagrant:latest"
 ROCKY9_IMAGE = "jcpetro97/rocky9-vagrant:latest"
 DEBIAN12_IMAGE = "jcpetro97/debian12-vagrant:latest"
@@ -13,29 +13,34 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
 
 # ubuntu controlnode
-    config.vm.define :"ubuntu-controlnode" do |ubcn|        
-        ubcn.vm.hostname = "ubuntu-controlnode"
-        ubcn.vm.provider :docker do |docker|
-            docker.image = UBUNTU2404_IMAGE
-            docker.remains_running = true
-            docker.has_ssh = true
-            docker.privileged = true
-            docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
-            docker.create_args = ["--cgroupns=host"]
-        end # docker    
-        ubcn.vm.synced_folder '.', '/vagrant', disabled: false
-        ubcn.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        ubcn.vm.provision :hosts, :sync_hosts => true
-        ubcn.vm.provision "shell" do |s|
+    config.vm.define :"ubuntu-controlnode" do |cn|        
+        cn.vm.hostname = "ubuntu-controlnode"
+        cn.vm.provider :docker do |docker|
+        docker.image = UBUNTU2404_IMAGE
+        docker.remains_running = true
+        docker.has_ssh = true
+        docker.privileged = true
+        docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
+        docker.create_args = ["--cgroupns=host"]
+    end # docker    
+        cn.vm.synced_folder '.', '/vagrant', disabled: false
+        cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        cn.vm.provision :hosts, :sync_hosts => true
+        cn.vm.provision "shell" do |s|
           s.inline = $ubinstall
           s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}     
         end #ubinstall
+        cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
+        cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        cn.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        cn.vm.provision "shell", inline: $hostsetup
     end # ubuntu-controlnode
 
-# rocky9-controlnode
-config.vm.define :"rocky9-controlnode" do |rky9cn|        
-    rky9cn.vm.hostname = "rocky9-controlnode"
-    rky9cn.vm.provider :docker do |docker|
+# redhat-controlnode
+config.vm.define :"redhat-controlnode" do |cn|        
+    cn.vm.hostname = "redhat-controlnode"
+    cn.vm.provider :docker do |docker|
         docker.image = ROCKY9_IMAGE
         docker.remains_running = true
         docker.has_ssh = true
@@ -43,22 +48,27 @@ config.vm.define :"rocky9-controlnode" do |rky9cn|
         docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
         docker.create_args = ["--cgroupns=host"]
     end # docker    
-    rky9cn.vm.synced_folder '.', '/vagrant', disabled: false
-    rky9cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
-    rky9cn.vm.provision :hosts, :sync_hosts => true
-    rky9cn.vm.provision "shell" do |s|
+    cn.vm.synced_folder '.', '/vagrant', disabled: false
+    cn.vm.network :private_network, type: "dhcp", docker_network__internal: true
+    cn.vm.provision :hosts, :sync_hosts => true
+    cn.vm.provision "shell" do |s|
       s.inline = $rhinstall
       s.env   = {ANSIBLE_VERSION:ENV['ANSIBLE_VERSION']}     
-    end #rky9install
+    end #ansible install
+    cn.vm.provision "file", source: "files/ansible.cfg", destination: "/home/vagrant/.ansible.cfg"
+    cn.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+    cn.vm.provision "shell", inline: $hostsetup
 end # rocky9-controlnode
 
     # Nodes
 # ubuntu2004 nodes
   (1..2).each do |i|     
     #config.vm.provision "shell", inline: "echo Sleep until plugin catches up; sleep 5" 
-    config.vm.define "ubuntu2004-node#{i}" do |ubuntu2004|     
-        ubuntu2004.vm.hostname = "ubuntu2004-node#{i}"   
-        ubuntu2004.vm.provider :docker do |docker|
+    config.vm.define "ubuntu2004-node#{i}" do |node|     
+        node.vm.hostname = "ubuntu2004-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = UBUNTU2004_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -66,17 +76,22 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        ubuntu2004.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        ubuntu2004.vm.provision :hosts, :sync_hosts => true
-        ubuntu2004.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
+
     end # end ubuntu2004
   end  # end each do
 
 # ubuntu2204 nodes
 (1..2).each do |i|     
-    config.vm.define "ubuntu2204-node#{i}" do |ubuntu2204|     
-        ubuntu2204.vm.hostname = "ubuntu2204-node#{i}"   
-        ubuntu2204.vm.provider :docker do |docker|
+    config.vm.define "ubuntu2204-node#{i}" do |node|     
+        node.vm.hostname = "ubuntu2204-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = UBUNTU2204_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -84,17 +99,21 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        ubuntu2204.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        ubuntu2204.vm.provision :hosts, :sync_hosts => true
-        ubuntu2204.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end ubuntu2204
   end  # end each do
 
 # ubuntu2404 nodes
 (1..2).each do |i|     
-    config.vm.define "ubuntu2404-node#{i}" do |ubuntu2404|     
-        ubuntu2404.vm.hostname = "ubuntu2404-node#{i}"   
-        ubuntu2404.vm.provider :docker do |docker|
+    config.vm.define "ubuntu2404-node#{i}" do |node|     
+        node.vm.hostname = "ubuntu2404-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = UBUNTU2404_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -102,35 +121,43 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        ubuntu2404.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        ubuntu2404.vm.provision :hosts, :sync_hosts => true
-        ubuntu2404.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end ubuntu2404
   end  # end each do
 
-# opensuse15 nodes
-(1..2).each do |i|     
-    config.vm.define "opensuse15-node#{i}" do |opensuse15|     
-        opensuse15.vm.hostname = "opensuse15-node#{i}"   
-        opensuse15.vm.provider :docker do |docker|
-            docker.image = OPENSUSE15_IMAGE
-            docker.remains_running = true
-            docker.has_ssh = true
-            docker.privileged = true
-            docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
-            docker.create_args = ["--cgroupns=host"]
-        end # docker    
-        opensuse15.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        opensuse15.vm.provision :hosts, :sync_hosts => true
-        opensuse15.vm.synced_folder '.', '/vagrant', disabled: true
-    end # end opensuse15
-  end  # end each do
+## opensuse15 nodes
+#(1..2).each do |i|     
+    #config.vm.define "opensuse15-node#{i}" do |node|     
+        #node.vm.hostname = "opensuse15-node#{i}"   
+        #node.vm.provider :docker do |docker|
+            #docker.image = OPENSUSE15_IMAGE
+            #docker.remains_running = true
+            #docker.has_ssh = true
+            #docker.privileged = true
+            #docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
+            #docker.create_args = ["--cgroupns=host"]
+        #end # docker    
+        #node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        #node.vm.provision :hosts, :sync_hosts => true
+        #node.vm.synced_folder '.', '/vagrant', disabled: false
+        #node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        #node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        #node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        #node.vm.provision "shell", inline: $hostsetup
+    #end # end opensuse15
+  #end  # end each do
 
 # rocky8 nodes
 (1..2).each do |i|     
-    config.vm.define "rocky8-node#{i}" do |rocky8|     
-        rocky8.vm.hostname = "rocky8-node#{i}"   
-        rocky8.vm.provider :docker do |docker|
+    config.vm.define "rocky8-node#{i}" do |node|     
+        node.vm.hostname = "rocky8-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = ROCKY8_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -138,17 +165,21 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        rocky8.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        rocky8.vm.provision :hosts, :sync_hosts => true
-        rocky8.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end rocky8
   end  # end each do
 
 # rocky9 nodes
 (1..2).each do |i|     
-    config.vm.define "rocky9-node#{i}" do |rocky9|     
-        rocky9.vm.hostname = "rocky9-node#{i}"   
-        rocky9.vm.provider :docker do |docker|
+    config.vm.define "rocky9-node#{i}" do |node|     
+        node.vm.hostname = "rocky9-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = ROCKY9_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -156,17 +187,21 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        rocky9.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        rocky9.vm.provision :hosts, :sync_hosts => true
-        rocky9.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end rocky9
   end  # end each do
   
 # debian12 nodes
 (1..2).each do |i|     
-    config.vm.define "debian12-node#{i}" do |debian12|     
-        debian12.vm.hostname = "debian12-node#{i}"   
-        debian12.vm.provider :docker do |docker|
+    config.vm.define "debian12-node#{i}" do |node|     
+        node.vm.hostname = "debian12-node#{i}"   
+        node.vm.provider :docker do |docker|
             docker.image = DEBIAN12_IMAGE
             docker.remains_running = true
             docker.has_ssh = true
@@ -174,9 +209,13 @@ end # rocky9-controlnode
             docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
             docker.create_args = ["--cgroupns=host"]
         end # docker    
-        debian12.vm.network :private_network, type: "dhcp", docker_network__internal: true
-        debian12.vm.provision :hosts, :sync_hosts => true
-        debian12.vm.synced_folder '.', '/vagrant', disabled: true
+        node.vm.network :private_network, type: "dhcp", docker_network__internal: true
+        node.vm.provision :hosts, :sync_hosts => true
+        node.vm.synced_folder '.', '/vagrant', disabled: false
+        node.vm.provision "shell", inline: "mkdir /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/ansibletest.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: "cp /vagrant/files/vagrant.pub /etc/sshkeys.local"
+        node.vm.provision "shell", inline: $hostsetup
     end # end debian12
   end  # end each do
 
@@ -190,20 +229,20 @@ $ubinstall = <<UBSCRIPT
   /usr/bin/apt update
   /usr/bin/apt -y install python3 python3-pip sshpass
   /bin/echo "------> upgrade pip <------"
-  /usr/bin/python3 -m pip install --upgrade pip
+  /usr/bin/python3 -m pip install --break-system-packages --upgrade pip
   /bin/echo "------> upgrade setuptools <------"
-  /usr/bin/python3 -m pip install --upgrade setuptools
+  /usr/bin/python3 -m pip install --break-system-packages --upgrade setuptools
   # Install Ansible.
   if [ -z "${ANSIBLE_VERSION}" ];
 
     then
         /bin/echo "------> Install Latest Version of Ansible  <------"
         #/usr/bin/python3 -m pip install ansible
-        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible' vagrant
+        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --break-system-packages --user ansible' vagrant
     else
         /bin/echo "------> Install Ansible $ANSIBLE_VERSION <------"
         #/usr/bin/python3 -m pip install ansible==$ANSIBLE_VERSION
-        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --user ansible==$ANSIBLE_VERSION' vagrant
+        su -c '/usr/bin/python3 -m pip install --no-warn-script-location --break-system-packages --user ansible==$ANSIBLE_VERSION' vagrant
     fi
     
   #
@@ -230,3 +269,31 @@ $rhinstall = <<RHSCRIPT
    su -c '~vagrant/.local/bin/ansible --version' vagrant
 
 RHSCRIPT
+
+$hostsetup = <<HOSTSETUP
+  #!/bin/bash
+  # Check to see if /etc/ssh/sshd_config.d exists
+  if [ -d /etc/ssh/sshd_config.d ] ; then
+      /usr/bin/cp /vagrant/files/pubkeys.conf /etc/ssh/sshd_config.d/02-pubkeys.conf  
+      if [ ! -f /etc/redhat-release ] ; then
+          echo "restarting ssh on a Debian based system"
+          systemctl restart ssh.service
+      else
+          echo "restarting ssh on a RedHat based system" 
+          systemctl restart sshd.service
+      fi
+  else 
+      # sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
+      sed -i '/AuthorizedKeysFile/c\AuthorizedKeysFile /etc/sshkeys/%u.pub /etc/sshkeys.local/%u.pub' /etc/ssh/sshd_config
+      if [ -f /etc/redhat-release ] ; then
+          echo "restarting ssh on a RedHat based system"
+          systemctl restart sshd.service
+      else
+          echo "restarting ssh on a Debian based system" 
+          systemctl restart ssh.service
+      fi
+  fi
+  useradd -m -s /bin/bash -c "Ansible TEST Service Account" ansibletest
+  echo "ansibletest ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/ansibletest
+  chmod 440 /etc/sudoers.d/ansibletest
+HOSTSETUP
