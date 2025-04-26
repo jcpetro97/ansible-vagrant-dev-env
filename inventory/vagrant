@@ -1,3 +1,6 @@
+[all:vars]
+ansible_user=ansibletest
+ansible_ssh_private_key_file=/vagrant/files/ansibletest
 [all]
 ubuntu2004-node1
 ubuntu2004-node2
